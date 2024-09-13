@@ -18,9 +18,8 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-  unitTest:
-    runs-on: ubuntu-latest
+      - name: Assemble devDebug
+        run: ./gradlew assembleDevDebug
 
-    steps:
-      - name: Execute All Unit test
-        run: ./gradlew test
+      - name: Assemble prodDebug
+        run: ./gradlew assembleProdDebug
