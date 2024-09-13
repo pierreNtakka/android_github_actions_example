@@ -1,4 +1,4 @@
-name: Android CI
+name: Android Example CI (Build all flavours)
 
 on:
   workflow_dispatch:
