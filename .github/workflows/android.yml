@@ -6,7 +6,7 @@ on:
       debug:
         type: boolean
         description: Printa dei valori che aiutano il debug
-        default: false
+        default: true
       appDemo:
         type: boolean
         description: Effettuare il rilascio delle App Demo (tutti gli env) su Firebase App Distribution
@@ -25,7 +25,7 @@ jobs:
       - name: set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          java-version: '22'
           distribution: 'temurin'
           cache: gradle
 
