@@ -29,22 +29,6 @@ jobs:
         run: chmod +x gradlew
 
 
-      - name: Increment SDK versionName and versionCode
-        run: ./gradlew incrementMavenVersion
-
-      - name: Assemble sdk devRelease
-        run: ./gradlew :myLibrary:uploadToMavenRepDevRelease
-
-      - name: Assemble sdk uatRelease
-        run: ./gradlew :myLibrary:uploadToMavenRepUatRelease
-
-      - name: Assemble sdk preProdRelease
-        run: ./gradlew :myLibrary:uploadToMavenRepPreProdRelease
-
-      - name: Assemble sdk prodRelease
-        run: ./gradlew :myLibrary:uploadToMavenRepProdRelease
-        
-
       - name: Increment App versionName and versionCode
         run: ./gradlew incrementVersion
 
