@@ -1,4 +1,4 @@
-name: Android SDK CI (Build all flavours)
+name: Android SDK CI
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
       debug:
         type: boolean
         description: Printa dei valori che aiutano il debug
-        default: true
+        default: false
       mavenSdk:
         type: boolean
         description: Effettuare il rilascio del SDK (tutti gli env) sul Gitlab Package Registry
