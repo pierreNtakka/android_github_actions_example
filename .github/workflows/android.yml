@@ -3,6 +3,10 @@ name: Android Example CI (Build all flavours)
 on:
   workflow_dispatch:
     inputs:
+      debug:
+        type: boolean
+        description: Printa dei valori che aiutano il debug
+        default: false
       appDemo:
         type: boolean
         description: Effettuare il rilascio delle App Demo (tutti gli env) su Firebase App Distribution
@@ -31,6 +35,8 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+
+
       - name: Increment SDK versionName and versionCode
         run: ./gradlew incrementMavenVersion
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
@@ -52,9 +58,16 @@ jobs:
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
 
 
+      - name: [ Debug ] print AppDemo versionCode PRE incremented
+        run: ./gradlew properties | grep APP_VERSION_CODE
+        if: ${{ github.event.inputs.debug == 'true' }}
 
       - name: Increment App versionName and versionCode
         run: ./gradlew incrementVersion
+
+      - name: [Debug] print AppDemo versionCode incremented
+        run: ./gradlew properties | grep APP_VERSION_CODE
+        if: ${{ github.event.inputs.debug == 'true' }}
 
       - name: Assemble devDebug
         run: ./gradlew uploadToAppDistributionDevDebug
