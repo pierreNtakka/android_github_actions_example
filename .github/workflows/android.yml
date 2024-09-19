@@ -32,9 +32,12 @@ jobs:
       - name: Check java version
         run: java --version
 
+      - name: Gradle Version
+        run: ./gradlew --version
+        if: ${{ github.event.inputs.debug == 'true' }}
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-
 
       - name: Gradle print App Variant
         run: ./gradlew printVariants
