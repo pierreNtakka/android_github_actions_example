@@ -3,7 +3,7 @@ name: Android Example CI (Build all flavours)
 on:
   workflow_dispatch:
     inputs:
-      debug:
+      printable:
         type: boolean
         description: Printa dei valori che aiutano il debug
         default: false
