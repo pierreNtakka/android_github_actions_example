@@ -7,11 +7,6 @@ on:
         type: boolean
         description: Printa dei valori che aiutano il debug
         default: true
-      appDemo:
-        type: boolean
-        description: Effettuare il rilascio delle App Demo (tutti gli env) su Firebase App Distribution
-        required: true
-        default: true
       mavenSdk:
         type: boolean
         description: Effettuare il rilascio del SDK (tutti gli env) sul Gitlab Package Registry
@@ -22,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Checkout
+      - name: Checkout Project
         uses: actions/checkout@v4
 
       - name: Set up JDK 20
@@ -69,19 +64,19 @@ jobs:
           ./gradlew properties | grep SDK_VERSION_CODE
           ./gradlew properties | grep BUILD_MAVEN_SDK_VERSION
 
-      - name: Assemble sdk devRelease
+      - name: Assemble SDK devRelease
         run: ./gradlew uploadToMavenRepDevRelease
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
 
-      - name: Assemble sdk uatRelease
+      - name: Assemble SDK uatRelease
         run: ./gradlew uploadToMavenRepUatRelease
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
 
-      - name: Assemble sdk preProdRelease
+      - name: Assemble SDK preProdRelease
         run: ./gradlew uploadToMavenRepPreProdRelease
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
 
-      - name: Assemble sdk prodRelease
+      - name: Assemble SDK prodRelease
         run: ./gradlew uploadToMavenRepProdRelease
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
 
