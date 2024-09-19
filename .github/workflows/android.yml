@@ -35,8 +35,16 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Clean Gradle cache
-        run: ./gradlew clean --refresh-dependencies
+
+      - name: Gradle print App Variant
+        run: ./gradlew printVariants
+        if: ${{ github.event.inputs.debug == 'true' }}
+
+      - name: Gradle print myLibrary Variant
+        run: ./gradlew printLibraryVariants
+        if: ${{ github.event.inputs.debug == 'true' }}
+
+        ##### SDK Variant ###########
 
       - name: Increment SDK versionName and versionCode
         run: ./gradlew incrementMavenVersion
@@ -58,6 +66,8 @@ jobs:
         run: ./gradlew :myLibrary:uploadToMavenRepProdRelease
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
 
+      ##### AppDemo Variant ###########
+
       - name: Print AppDemo versionCode PRE incremented
         run: ./gradlew properties | grep APP_VERSION_CODE
         if: ${{ github.event.inputs.debug == 'true' }}
@@ -70,13 +80,13 @@ jobs:
         if: ${{ github.event.inputs.debug == 'true' }}
 
       - name: Assemble devDebug
-        run: ./gradlew uploadToAppDistributionDevDebug
+        run: ./gradlew uploadToAppDistributionDevDebug --debug
 
       - name: Assemble uatDebug
-        run: ./gradlew uploadToAppDistributionUatDebug
+        run: ./gradlew uploadToAppDistributionUatDebug --debug
 
       - name: Assemble preProdDebug
-        run: ./gradlew uploadToAppDistributionPreprodDebug
+        run: ./gradlew uploadToAppDistributionPreprodDebug --debug
 
       - name: Assemble prodDebug
-        run: ./gradlew uploadToAppDistributionProdDebug
+        run: ./gradlew uploadToAppDistributionProdDebug --debug

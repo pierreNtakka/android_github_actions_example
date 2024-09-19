@@ -49,6 +49,15 @@ task incrementFakeMavenVersion(name: this.name) {
 }
 
 
+
+tasks.register("printVariants") {
+    doLast {
+        android.applicationVariants.all { variant ->
+            println "Variant: ${variant.name}"
+        }
+    }
+}
+
 android.applicationVariants.configureEach { variant ->
     def variantName = "${variant.name.capitalize()}"
     def assembleVariantName = "assemble${variantName}"

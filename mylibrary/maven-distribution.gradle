@@ -27,6 +27,16 @@ android.libraryVariants.configureEach { variant ->
     }
 }
 
+
+tasks.register("printLibraryVariants") {
+    doLast {
+
+        android.libraryVariants.configureEach { variant ->
+            println "LibraryVariant: ${variant.name}"
+        }
+    }
+}
+
 task incrementMavenVersion(name: this.name, group: mavenDistrTaskGroupName) {
     description "Increment the api-module SDK versionCode and versionName"
     doLast {
