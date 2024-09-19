@@ -25,7 +25,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: set up JDK 20
+      - name: Set up JDK 20
         uses: actions/setup-java@v4
         with:
           java-version: '20'
@@ -55,7 +55,7 @@ jobs:
         run: ./gradlew incrementMavenVersion
         if: ${{ github.event.inputs.mavenSdk == 'true' && github.event.inputs.mavenSdk == 'true' }}
 
-      - name: Print AppDemo DK versionCode and versionName POST incremented
+      - name: Print SDK versionCode and versionName POST incremented
         if: ${{ github.event.inputs.debug == 'true' && github.event.inputs.mavenSdk == 'true'}}
         run: |
           ./gradlew properties | grep SDK_VERSION_CODE
@@ -79,7 +79,7 @@ jobs:
 
       ##### AppDemo Variant ###########
 
-      - name: Print AppDemo versionCode PRE incremented
+      - name: Print AppDemo versionCode e versionName PRE incremented
         if: ${{ github.event.inputs.debug == 'true' }}
         run: |
           ./gradlew properties | grep APP_VERSION_CODE
@@ -88,30 +88,39 @@ jobs:
       - name: Increment App versionName and versionCode
         run: ./gradlew incrementVersion
 
-      - name: Print AppDemo versionCode POST incremented
+      - name: Print AppDemo versionCode e versionName POST incremented
         if: ${{ github.event.inputs.debug == 'true' }}
         run: |
           ./gradlew properties | grep APP_VERSION_CODE
           ./gradlew properties | grep APP_VERSION_NAME
+
+      - name: Assemble devDebug
+        run: ./gradlew uploadToAppDistributionDevDebug
+
+      - name: Assemble uatDebug
+        run: ./gradlew uploadToAppDistributionUatDebug
+
+      - name: Assemble preProdDebug
+        run: ./gradlew uploadToAppDistributionPreprodDebug
+
+      - name: Assemble prodDebug
+        run: ./gradlew uploadToAppDistributionProdDebug
 
       - name: Git Commit & Push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "${{ github.actor }}@users.noreply.github.com"
           
-          #Estrai i valori e rimuovi gli spazi extra
           APP_VERSION_NAME=$(./gradlew properties | grep "APP_VERSION_NAME" | sed 's/.*: //')
           APP_VERSION_CODE=$(./gradlew properties | grep "APP_VERSION_CODE" | sed 's/.*: //')
           SDK_VERSION_CODE=$(./gradlew properties | grep "SDK_VERSION_CODE" | sed 's/.*: //')
           BUILD_MAVEN_SDK_VERSION=$(./gradlew properties | grep "BUILD_MAVEN_SDK_VERSION" | sed 's/.*: //')
 
-          # Crea il messaggio di commit usando le variabili
           GIT_COMMIT_MESSAGE="build(release): AppDemo: versionName: $APP_VERSION_NAME, versionCode: $APP_VERSION_CODE. SDK: versionName: $BUILD_MAVEN_SDK_VERSION, versionCode: $SDK_VERSION_CODE. Maven version: $BUILD_MAVEN_SDK_VERSION"
-      
+          
           git add .
           git commit -m "$GIT_COMMIT_MESSAGE"
           git push
-
 
       - name: Git Tag
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
