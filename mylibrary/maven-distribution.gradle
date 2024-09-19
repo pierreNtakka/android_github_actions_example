@@ -1,0 +1,51 @@
+apply plugin: 'maven-publish'
+
+def mavenDistrTaskGroupName = "maven"
+def refBuildType = "release"
+
+def flavorUploadMavenPrefixTaskName = "uploadToMavenRep"
+
+android.libraryVariants.configureEach { variant ->
+
+    def variantName = "${variant.name.capitalize()}"
+    def assembleVariantName = "assemble${variantName}"
+
+
+    if (variant.buildType.name == refBuildType) {
+
+        tasks.register("${flavorUploadMavenPrefixTaskName}${variantName}") {
+            group = mavenDistrTaskGroupName
+            description = "Assemble ${variantName} and publish the ${variantName} SDK to Maven Repository"
+            dependsOn clean.name
+            dependsOn assembleVariantName
+
+            tasks.named(assembleVariantName).get().mustRunAfter(clean)
+            tasks.named("${flavorUploadMavenPrefixTaskName}${variantName}").get().mustRunAfter(assembleVariantName)
+            doLast {
+                System.out.println("Fintio ${flavorUploadMavenPrefixTaskName}${variantName}")
+            }
+        }
+    }
+}
+
+task incrementMavenVersion(name: this.name, group: mavenDistrTaskGroupName) {
+    description "Increment the api-module SDK versionCode and versionName"
+    doLast {
+        ant.propertyfile(file: "../gradle.properties") {
+
+            def splittedVersion = BUILD_MAVEN_SDK_VERSION.split("\\.")
+
+            def major = splittedVersion[0].toInteger()
+            def minor = splittedVersion[1].toInteger()
+            def patch = splittedVersion[2].toInteger()
+            def buildNumber = splittedVersion[3].toInteger() + 1
+
+            BUILD_MAVEN_SDK_VERSION = "${major}.${minor}.${patch}.${buildNumber}"
+            entry(key: "BUILD_MAVEN_SDK_VERSION", value: BUILD_MAVEN_SDK_VERSION)
+
+            def sdkVersionCode = SDK_VERSION_CODE.toInteger() + 1
+            SDK_VERSION_CODE = sdkVersionCode
+            entry(key: "SDK_VERSION_CODE", value: SDK_VERSION_CODE.toInteger())
+        }
+    }
+}

@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "GitHub Actions"
 include ':app'
+include ':myLibrary'

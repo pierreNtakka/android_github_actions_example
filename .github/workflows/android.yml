@@ -2,6 +2,15 @@ name: Android Example CI (Build all flavours)
 
 on:
   workflow_dispatch:
+    inputs:
+      appDemo:
+        type: boolean
+        description: Effettuare il rilascio delle App Demo (tutti gli env) su Firebase App Distribution
+        default: true
+      mavenSdk:
+        type: boolean
+        description: Effettuare il rilascio del SDK (tutti gli env) sul Gitlab Package Registry
+        default: false
 
 jobs:
   setUp:
@@ -18,8 +27,34 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+
+      - name: Increment SDK versionName and versionCode
+        run: ./gradlew incrementMavenVersion
+
+      - name: Assemble sdk devRelease
+        run: ./gradlew uploadToMavenRepDevRelease
+
+      - name: Assemble sdk uatRelease
+        run: ./gradlew uploadToMavenRepUatRelease
+
+      - name: Assemble sdk preProdRelease
+        run: ./gradlew uploadToMavenRepPreProdRelease
+
+      - name: Assemble sdk prodRelease
+        run: ./gradlew uploadToMavenRepProdRelease
+
+
+      - name: Increment App versionName and versionCode
+        run: ./gradlew incrementVersion
+
       - name: Assemble devDebug
-        run: ./gradlew assembleDevDebug
+        run: ./gradlew uploadToAppDistributionDevDebug
+
+      - name: Assemble uatDebug
+        run: ./gradlew uploadToAppDistributionUatDebug
+
+      - name: Assemble preProdDebug
+        run: ./gradlew uploadToAppDistributionPreprodDebug
 
       - name: Assemble prodDebug
-        run: ./gradlew assembleProdDebug
+        run: ./gradlew uploadToAppDistributionProdDebug
