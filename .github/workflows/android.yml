@@ -62,19 +62,19 @@ jobs:
           ./gradlew properties | grep BUILD_MAVEN_SDK_VERSION
 
       - name: Assemble sdk devRelease
-        run: ./gradlew :myTestLibrary:uploadToMavenRepDevRelease
+        run: ./gradlew uploadToMavenRepDevRelease
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
 
       - name: Assemble sdk uatRelease
-        run: ./gradlew :myTestLibrary:uploadToMavenRepUatRelease
+        run: ./gradlew uploadToMavenRepUatRelease
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
 
       - name: Assemble sdk preProdRelease
-        run: ./gradlew :myTestLibrary:uploadToMavenRepPreProdRelease
+        run: ./gradlew uploadToMavenRepPreProdRelease
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
 
       - name: Assemble sdk prodRelease
-        run: ./gradlew :myTestLibrary:uploadToMavenRepProdRelease
+        run: ./gradlew uploadToMavenRepProdRelease
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
 
       ##### AppDemo Variant ###########
