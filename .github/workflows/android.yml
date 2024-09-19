@@ -47,7 +47,7 @@ jobs:
         run: ./gradlew printVariants
         if: ${{ github.event.inputs.debug == 'true' }}
 
-      - name: Gradle print myLibrary Variant
+      - name: Gradle print myTestLibrary Variant
         run: ./gradlew printLibraryVariants
         if: ${{ github.event.inputs.debug == 'true' }}
 
@@ -58,19 +58,19 @@ jobs:
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
 
       - name: Assemble sdk devRelease
-        run: ./gradlew :myLibrary:uploadToMavenRepDevRelease
+        run: ./gradlew :myTestLibrary:uploadToMavenRepDevRelease
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
 
       - name: Assemble sdk uatRelease
-        run: ./gradlew :myLibrary:uploadToMavenRepUatRelease
+        run: ./gradlew :myTestLibrary:uploadToMavenRepUatRelease
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
 
       - name: Assemble sdk preProdRelease
-        run: ./gradlew :myLibrary:uploadToMavenRepPreProdRelease
+        run: ./gradlew :myTestLibrary:uploadToMavenRepPreProdRelease
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
 
       - name: Assemble sdk prodRelease
-        run: ./gradlew :myLibrary:uploadToMavenRepProdRelease
+        run: ./gradlew :myTestLibrary:uploadToMavenRepProdRelease
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
 
       ##### AppDemo Variant ###########
