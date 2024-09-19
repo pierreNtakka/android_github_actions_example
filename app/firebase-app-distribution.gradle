@@ -48,16 +48,6 @@ task incrementFakeMavenVersion(name: this.name) {
     }
 }
 
-
-
-tasks.register("printVariants") {
-    doLast {
-        android.applicationVariants.all { variant ->
-            println "Variant: ${variant.name}"
-        }
-    }
-}
-
 android.applicationVariants.configureEach { variant ->
     def variantName = "${variant.name.capitalize()}"
     def assembleVariantName = "assemble${variantName}"
@@ -74,6 +64,7 @@ android.applicationVariants.configureEach { variant ->
 
             tasks.named(assembleVariantName).get().mustRunAfter(clean)
             tasks.named(uploadToFirebaseAppDistrTaskName).get().mustRunAfter(assembleVariantName)
+
             doLast {
                 System.out.println("Finito ${uploadToFirebaseAppDistrTaskName}")
             }
