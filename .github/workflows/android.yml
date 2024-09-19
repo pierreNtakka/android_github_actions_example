@@ -57,15 +57,14 @@ jobs:
         run: ./gradlew :myLibrary:uploadToMavenRepProdRelease
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
 
-
-      - name: [ Debug ] print AppDemo versionCode PRE incremented
+      - name: Print AppDemo versionCode PRE incremented
         run: ./gradlew properties | grep APP_VERSION_CODE
         if: ${{ github.event.inputs.debug == 'true' }}
 
       - name: Increment App versionName and versionCode
         run: ./gradlew incrementVersion
 
-      - name: [Debug] print AppDemo versionCode incremented
+      - name: Print AppDemo versionCode incremented
         run: ./gradlew properties | grep APP_VERSION_CODE
         if: ${{ github.event.inputs.debug == 'true' }}
 
