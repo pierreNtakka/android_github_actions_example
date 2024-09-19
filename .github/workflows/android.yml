@@ -6,6 +6,7 @@ on:
       appDemo:
         type: boolean
         description: Effettuare il rilascio delle App Demo (tutti gli env) su Firebase App Distribution
+        required: true
         default: true
       mavenSdk:
         type: boolean
@@ -32,17 +33,17 @@ jobs:
         run: ./gradlew incrementMavenVersion
 
       - name: Assemble sdk devRelease
-        run: ./gradlew uploadToMavenRepDevRelease
+        run: ./gradlew :myLibrary:uploadToMavenRepDevRelease
 
       - name: Assemble sdk uatRelease
-        run: ./gradlew uploadToMavenRepUatRelease
+        run: ./gradlew :myLibrary:uploadToMavenRepUatRelease
 
       - name: Assemble sdk preProdRelease
-        run: ./gradlew uploadToMavenRepPreProdRelease
+        run: ./gradlew :myLibrary:uploadToMavenRepPreProdRelease
 
       - name: Assemble sdk prodRelease
-        run: ./gradlew uploadToMavenRepProdRelease
-
+        run: ./gradlew :myLibrary:uploadToMavenRepProdRelease
+        
 
       - name: Increment App versionName and versionCode
         run: ./gradlew incrementVersion
