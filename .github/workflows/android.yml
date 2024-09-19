@@ -28,6 +28,26 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Increment SDK versionName and versionCode
+        run: ./gradlew incrementMavenVersion
+        if: ${{ github.event.inputs.mavenSdk == 'true' }}
+
+      - name: Assemble sdk devRelease
+        run: ./gradlew :myLibrary:uploadToMavenRepDevRelease
+        if: ${{ github.event.inputs.mavenSdk == 'true' }}
+
+      - name: Assemble sdk uatRelease
+        run: ./gradlew :myLibrary:uploadToMavenRepUatRelease
+        if: ${{ github.event.inputs.mavenSdk == 'true' }}
+
+      - name: Assemble sdk preProdRelease
+        run: ./gradlew :myLibrary:uploadToMavenRepPreProdRelease
+        if: ${{ github.event.inputs.mavenSdk == 'true' }}
+
+      - name: Assemble sdk prodRelease
+        run: ./gradlew :myLibrary:uploadToMavenRepProdRelease
+        if: ${{ github.event.inputs.mavenSdk == 'true' }}
+
 
       - name: Increment App versionName and versionCode
         run: ./gradlew incrementVersion
