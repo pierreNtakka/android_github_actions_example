@@ -119,6 +119,7 @@ jobs:
         if: ${{ github.event.inputs.debug == 'true' }}
         run: |
           echo "The JSON file is located at: $GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY"
+          cat $GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY
 
       - name: Assemble devDebug
         run: ./gradlew uploadToAppDistributionUatDebug
