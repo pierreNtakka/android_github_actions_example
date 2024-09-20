@@ -53,6 +53,7 @@ android {
 
     firebaseAppDistribution {
         artifactType = "APK"
+        serviceCredentialsFile = System.getenv("GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY")
     }
 
     flavorDimensions = ["example"]
@@ -60,9 +61,9 @@ android {
     productFlavors {
         dev {
             dimension "example"
-            applicationIdSuffix ".work"
+            applicationIdSuffix ".dev"
             firebaseAppDistribution.groups = "testers"
-            firebaseAppDistribution.releaseNotes = String.format(firebaseReleaseNote, "WORK")
+            firebaseAppDistribution.releaseNotes = String.format(firebaseReleaseNote, "DEV")
         }
         uat {
             dimension "example"

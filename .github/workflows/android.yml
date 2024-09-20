@@ -88,7 +88,6 @@ jobs:
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
 
       ##### AppDemo Variant ###########
-
       - name: Print AppDemo versionCode e versionName PRE incremented
         if: ${{ github.event.inputs.debug == 'true' }}
         run: |
@@ -104,8 +103,25 @@ jobs:
           ./gradlew properties | grep APP_VERSION_CODE
           ./gradlew properties | grep APP_VERSION_NAME
 
+      - name: Create JSON file from secret
+        run: |
+          # Create a directory to store the JSON file (optional)
+          mkdir -p config
+          
+          # Write the secret to a JSON file
+          echo '${{ secrets.APP_DISTR_FILE_CONTENT_KEY }}' > config/firebaseAppDistr.json
+          
+          # Export the path to the JSON file as an environment variable
+          echo "MY_JSON_PATH=$PWD/config/firebaseAppDistr.json" >> $GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY
+
+      # Step 3: Print the environment variable to verify
+      - name: Print the JSON path
+        if: ${{ github.event.inputs.debug == 'true' }}
+        run: |
+          echo "The JSON file is located at: $GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY"
+
       - name: Assemble devDebug
-        run: ./gradlew uploadToAppDistributionDevDebug
+        run: ./gradlew uploadToAppDistributionUatDebug
 
       - name: Assemble uatDebug
         run: ./gradlew uploadToAppDistributionUatDebug
@@ -115,6 +131,23 @@ jobs:
 
       - name: Assemble prodDebug
         run: ./gradlew uploadToAppDistributionProdDebug
+
+      - name: Clean up JSON file and environment variable
+        if: always()
+        run: |
+          echo "Cleaning up..."
+          
+          # Remove the file if it exists
+          if [ -f "$GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY" ]; then
+            rm $GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY
+            echo "JSON file removed."
+          else
+            echo "No JSON file found."
+          fi
+          
+          # Remove the environment variable
+          echo "Removing the GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY environment variable."
+          unset GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY
 
       - name: Git Commit & Push
         run: |

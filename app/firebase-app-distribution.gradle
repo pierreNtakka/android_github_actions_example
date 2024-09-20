@@ -1,26 +1,17 @@
 def firebaseGroupName = "firebase"
 def refBuildType = "debug"
+def firebaseAppDistributionPrefixTaskName = "appDistributionUpload"
 def flavorAppDistrPrefixTaskName = "uploadToAppDistribution"
-
+def uploadToFirebaseTasksName = new ArrayList<String>()
 
 task incrementVersion(name: this.name) {
     doLast {
         ant.propertyfile(file: "../gradle.properties") {
 
-
-            def appDemoVersionCode = APP_VERSION_CODE.toInteger() + 1
-            APP_VERSION_CODE = appDemoVersionCode
-            entry(key: "APP_VERSION_CODE", value: APP_VERSION_CODE.toString())
-
-
-            def splittedVersion = APP_VERSION_NAME.split("\\.")
-
-            def major = splittedVersion[0].toInteger()
-            def minor = splittedVersion[1].toInteger()
-            def patch = splittedVersion[2].toInteger() + 1
-
-            APP_VERSION_NAME = "${major}.${minor}.${patch}"
-            entry(key: "APP_VERSION_NAME", value: APP_VERSION_NAME)
+            def appDemoVersionCode = APP_DEMO_VERSION_CODE.toInteger()
+            appDemoVersionCode = appDemoVersionCode + 1
+            APP_DEMO_VERSION_CODE = appDemoVersionCode
+            entry(key: "APP_DEMO_VERSION_CODE", value: APP_DEMO_VERSION_CODE.toString())
         }
     }
 }
@@ -29,23 +20,30 @@ android.applicationVariants.configureEach { variant ->
     def variantName = "${variant.name.capitalize()}"
     def assembleVariantName = "assemble${variantName}"
 
+    def unitTestTaskName = "test${variantName}UnitTest"
+    tasks.named(unitTestTaskName).get().dependsOn(":myTestLibrary:${unitTestTaskName}")
+
+    def appDistributionUploadVariantName = "${firebaseAppDistributionPrefixTaskName}${variantName}"
+    tasks.named(appDistributionUploadVariantName).get().dependsOn(assembleVariantName)
+
     if (variant.buildType.name == refBuildType) {
+        uploadToFirebaseTasksName.add(appDistributionUploadVariantName)
 
         def uploadToFirebaseAppDistrTaskName = "${flavorAppDistrPrefixTaskName}${variantName}"
 
         tasks.register(uploadToFirebaseAppDistrTaskName) {
             group = firebaseGroupName
-            description = "assemble ${variantName} and publish app to Firebase App Distibution"
+            description = "run unit test, assemble ${variantName} and publish app to Firebase App Distibution"
             dependsOn clean.name
+            dependsOn unitTestTaskName
             dependsOn assembleVariantName
+            dependsOn appDistributionUploadVariantName
 
-            tasks.named(assembleVariantName).get().mustRunAfter(clean)
-            tasks.named(uploadToFirebaseAppDistrTaskName).get().mustRunAfter(assembleVariantName)
+            tasks.named(assembleVariantName).get().dependsOn(unitTestTaskName)
 
-            doLast {
-                System.out.println("Finito ${uploadToFirebaseAppDistrTaskName}")
-            }
+            tasks.named(unitTestTaskName).get().mustRunAfter(clean)
+            tasks.named(assembleVariantName).get().mustRunAfter(unitTestTaskName)
+            tasks.named(appDistributionUploadVariantName).get().mustRunAfter(assembleVariantName)
         }
-
     }
 }
