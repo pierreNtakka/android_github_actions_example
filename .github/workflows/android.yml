@@ -70,30 +70,3 @@ jobs:
           # Remove the environment variable
           echo "Removing the GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY environment variable."
           unset GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY
-
-      - name: Git Commit & Push
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "${{ github.actor }}@users.noreply.github.com"
-          
-          APP_VERSION_NAME=$(./gradlew properties | grep "APP_VERSION_NAME" | sed 's/.*: //')
-          APP_VERSION_CODE=$(./gradlew properties | grep "APP_VERSION_CODE" | sed 's/.*: //')
-          SDK_VERSION_CODE=$(./gradlew properties | grep "SDK_VERSION_CODE" | sed 's/.*: //')
-          BUILD_MAVEN_SDK_VERSION=$(./gradlew properties | grep "BUILD_MAVEN_SDK_VERSION" | sed 's/.*: //')
-
-          GIT_COMMIT_MESSAGE="build(release): AppDemo: versionName: $APP_VERSION_NAME, versionCode: $APP_VERSION_CODE. SDK: versionName: $BUILD_MAVEN_SDK_VERSION, versionCode: $SDK_VERSION_CODE. Maven version: $BUILD_MAVEN_SDK_VERSION"
-          
-          git add .
-          git commit -m "$GIT_COMMIT_MESSAGE"
-          git push
-
-      - name: Git Tag
-        if: ${{ github.event.inputs.mavenSdk == 'true' }}
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "${{ github.actor }}@users.noreply.github.com"
-          
-          GIT_TAG_NAME=$(./gradlew properties | grep "BUILD_MAVEN_SDK_VERSION" | sed 's/.*: //')
-          
-          git tag $GIT_TAG_NAME
-          git push origin $GIT_TAG_NAME
