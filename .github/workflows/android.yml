@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GPR_USER: ${{ github.actor }}
-      GPR_API_KEY: ${{ secrets.my-first-token }}
+      GPR_API_KEY: ${{ secrets.MAVEN_UPLOAD_TOKEN }}
     steps:
 
       - name: Checkout Project
