@@ -9,7 +9,7 @@ on:
         default: false
       mavenSdk:
         type: boolean
-        description: Effettuare il rilascio del SDK (tutti gli env) sul Gitlab Package Registry
+        description: Effettua il rilascio del SDK (tutti gli env) sul Gitlab Package Registry
         default: false
 
 jobs:
@@ -65,19 +65,19 @@ jobs:
           ./gradlew properties | grep BUILD_MAVEN_SDK_VERSION
 
       - name: Assemble SDK devRelease
-        run: ./gradlew uploadToMavenRepDevRelease
+        run: ./gradlew uploadToGitHubPkgDevRelease
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
 
       - name: Assemble SDK uatRelease
-        run: ./gradlew uploadToMavenRepUatRelease
+        run: ./gradlew uploadToGitHubPkgUatRelease
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
 
       - name: Assemble SDK preProdRelease
-        run: ./gradlew uploadToMavenRepPreProdRelease
+        run: ./gradlew uploadToGitHubPkgPreProdRelease
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
 
       - name: Assemble SDK prodRelease
-        run: ./gradlew uploadToMavenRepProdRelease
+        run: ./gradlew uploadToGitHubPkgProdRelease
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
 
       ##### AppDemo Variant ###########

@@ -41,11 +41,15 @@ android {
         }
         preProd {
             dimension "example"
-
         }
         prod {
             dimension "example"
+        }
+    }
 
+    libraryVariants.configureEach { variant ->
+        variant.outputs.configureEach { output ->
+            outputFileName = "myTestLibrary-${variant.name}.aar"
         }
     }
 }
