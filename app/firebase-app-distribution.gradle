@@ -8,10 +8,18 @@ task incrementVersion(name: this.name) {
     doLast {
         ant.propertyfile(file: "../gradle.properties") {
 
-            def appDemoVersionCode = APP_DEMO_VERSION_CODE.toInteger()
-            appDemoVersionCode = appDemoVersionCode + 1
-            APP_DEMO_VERSION_CODE = appDemoVersionCode
-            entry(key: "APP_DEMO_VERSION_CODE", value: APP_DEMO_VERSION_CODE.toString())
+            def appDemoVersionCode = APP_VERSION_CODE.toInteger() + 1
+            APP_VERSION_CODE = appDemoVersionCode
+            entry(key: "APP_VERSION_CODE", value: APP_VERSION_CODE.toString())
+
+            def splittedVersion = APP_VERSION_NAME.split("\\.")
+
+            def major = splittedVersion[0].toInteger()
+            def minor = splittedVersion[1].toInteger()
+            def patch = splittedVersion[2].toInteger() + 1
+
+            APP_VERSION_NAME = "${major}.${minor}.${patch}"
+            entry(key: "APP_VERSION_NAME", value: APP_VERSION_NAME)
         }
     }
 }
