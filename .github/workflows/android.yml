@@ -18,8 +18,8 @@ jobs:
     env:
       GPR_USER: ${{ github.actor }}
       GPR_API_KEY: ${{ secrets.MAVEN_UPLOAD_TOKEN }}
-    steps:
 
+    steps:
       - name: Checkout Project
         uses: actions/checkout@v4
 

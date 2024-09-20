@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.app.distribution)
 }
 
 apply from: "firebase-app-distribution.gradle"
@@ -47,22 +49,38 @@ android {
         }
     }
 
+    def firebaseReleaseNote = "GitHub Actions Example %s"
+
+    firebaseAppDistribution {
+        artifactType = "APK"
+    }
+
     flavorDimensions = ["example"]
 
     productFlavors {
         dev {
             dimension "example"
+            applicationIdSuffix ".work"
+            firebaseAppDistribution.groups = "testers"
+            firebaseAppDistribution.releaseNotes = String.format(firebaseReleaseNote, "WORK")
         }
         uat {
             dimension "example"
+            applicationIdSuffix ".uat"
+            firebaseAppDistribution.releaseNotes = String.format(firebaseReleaseNote, "UAT")
+            firebaseAppDistribution.groups = "testers"
         }
         preProd {
             dimension "example"
-
+            applicationIdSuffix ".preprod"
+            firebaseAppDistribution.releaseNotes = String.format(firebaseReleaseNote, "PREPROD")
+            firebaseAppDistribution.groups = "testers"
         }
         prod {
             dimension "example"
-
+            applicationIdSuffix ".prod"
+            firebaseAppDistribution.releaseNotes = String.format(firebaseReleaseNote, "PROD")
+            firebaseAppDistribution.groups = "testers"
         }
     }
 }
@@ -78,6 +96,8 @@ dependencies {
     implementation libs.androidx.ui.tooling.preview
     implementation libs.androidx.material3
 
+    implementation platform(libs.firebase.bom)
+
     implementation project(path: '::myTestLibrary')
 
     testImplementation libs.junit
@@ -85,6 +105,7 @@ dependencies {
     androidTestImplementation libs.androidx.espresso.core
     androidTestImplementation platform(libs.androidx.compose.bom)
     androidTestImplementation libs.androidx.ui.test.junit4
+
 
     debugImplementation libs.androidx.ui.tooling
     debugImplementation libs.androidx.ui.test.manifest

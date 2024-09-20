@@ -25,29 +25,6 @@ task incrementVersion(name: this.name) {
     }
 }
 
-
-task incrementFakeMavenVersion(name: this.name) {
-    doLast {
-        ant.propertyfile(file: "../gradle.properties") {
-
-
-            def appDemoVersionCode = APP_VERSION_CODE.toInteger() + 1
-            APP_VERSION_CODE = appDemoVersionCode
-            entry(key: "APP_VERSION_CODE", value: APP_VERSION_CODE.toString())
-
-
-            def splittedVersion = APP_VERSION_NAME.split("\\.")
-
-            def major = splittedVersion[0].toInteger()
-            def minor = splittedVersion[1].toInteger()
-            def patch = splittedVersion[2].toInteger() + 1
-
-            APP_VERSION_NAME = "${major}.${minor}.${patch}"
-            entry(key: "APP_VERSION_NAME", value: APP_VERSION_NAME)
-        }
-    }
-}
-
 android.applicationVariants.configureEach { variant ->
     def variantName = "${variant.name.capitalize()}"
     def assembleVariantName = "assemble${variantName}"
