@@ -40,10 +40,9 @@ publishing {
         maven {
             name = "GitHubPkg"
             url = uri("https://maven.pkg.github.com/pierreNtakka/android_github_actions_example")
-            allowInsecureProtocol = true
             credentials {
-                username = "pierreNtakka"
-                password = "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"
+                username = "${System.getenv("GPR_USER")}"
+                password = "${System.getenv("GPR_API_KEY")}"
             }
         }
     }
@@ -104,5 +103,15 @@ task incrementMavenVersion(name: this.name, group: mavenDistrTaskGroupName) {
             SDK_VERSION_CODE = sdkVersionCode
             entry(key: "SDK_VERSION_CODE", value: SDK_VERSION_CODE.toInteger())
         }
+    }
+}
+
+
+tasks.register("retrieveEnvVariables") {
+    group mavenDistrTaskGroupName
+    description "Increment the api-module SDK versionCode and versionName"
+    doLast {
+        println("Valore GPR_API_KEY=${System.getenv("GPR_API_KEY")}")
+        println("Valore GPR_USER=${System.getenv("GPR_USER")}")
     }
 }

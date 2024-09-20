@@ -15,6 +15,9 @@ on:
 jobs:
   deliverable:
     runs-on: ubuntu-latest
+    env:
+      GPR_USER: ${{ github.actor }}
+      GPR_API_KEY: ${{ secrets.my-first-token }}
     steps:
 
       - name: Checkout Project
@@ -40,6 +43,10 @@ jobs:
 
       - name: Gradle Version
         run: ./gradlew --version
+        if: ${{ github.event.inputs.debug == 'true' }}
+
+      - name: Test Gradle env variable used
+        run: ./gradlew retrieveEnvVariables
         if: ${{ github.event.inputs.debug == 'true' }}
 
       - name: Gradle All Tasks
