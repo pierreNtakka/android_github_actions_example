@@ -18,7 +18,6 @@ jobs:
     env:
       GPR_USER: ${{ github.actor }}
       GPR_API_KEY: ${{ secrets.MAVEN_UPLOAD_TOKEN }}
-      APP_DISTR_FILE_CONTENT_KEY: ${{ secrets.APP_DISTR_FILE_CONTENT_KEY }}
 
     steps:
       - name: Checkout Project
@@ -31,21 +30,89 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      - name: File List
+        run: ls -lrt
+        if: ${{ github.event.inputs.debug == 'true' }}
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Java version
+        run: java --version
+        if: ${{ github.event.inputs.debug == 'true' }}
+
+      - name: Gradle Version
+        run: ./gradlew --version
+        if: ${{ github.event.inputs.debug == 'true' }}
+
+      - name: Test Gradle env variable used
+        run: ./gradlew retrieveEnvVariables
+        if: ${{ github.event.inputs.debug == 'true' }}
+
+      - name: Gradle All Tasks
+        run: ./gradlew tasks --all
+        if: ${{ github.event.inputs.debug == 'true' }}
+
+        ##### SDK Variant ###########
+
+      - name: Print SDK versionCode and versionName PRE incremented
+        if: ${{ github.event.inputs.debug == 'true' && github.event.inputs.mavenSdk == 'true' }}
+        run: |
+          ./gradlew properties | grep SDK_VERSION_CODE
+          ./gradlew properties | grep BUILD_MAVEN_SDK_VERSION
+
+      - name: Increment SDK versionName and versionCode
+        run: ./gradlew incrementMavenVersion
+        if: ${{ github.event.inputs.mavenSdk == 'true' && github.event.inputs.mavenSdk == 'true' }}
+
+      - name: Print SDK versionCode and versionName POST incremented
+        if: ${{ github.event.inputs.debug == 'true' && github.event.inputs.mavenSdk == 'true'}}
+        run: |
+          ./gradlew properties | grep SDK_VERSION_CODE
+          ./gradlew properties | grep BUILD_MAVEN_SDK_VERSION
+
+      - name: Assemble SDK devRelease
+        run: ./gradlew uploadToGitHubPkgDevRelease
+        if: ${{ github.event.inputs.mavenSdk == 'true' }}
+
+      - name: Assemble SDK uatRelease
+        run: ./gradlew uploadToGitHubPkgUatRelease
+        if: ${{ github.event.inputs.mavenSdk == 'true' }}
+
+      - name: Assemble SDK preProdRelease
+        run: ./gradlew uploadToGitHubPkgPreProdRelease
+        if: ${{ github.event.inputs.mavenSdk == 'true' }}
+
+      - name: Assemble SDK prodRelease
+        run: ./gradlew uploadToGitHubPkgProdRelease
+        if: ${{ github.event.inputs.mavenSdk == 'true' }}
+
+      ##### AppDemo Variant ###########
+      - name: Print AppDemo versionCode e versionName PRE incremented
+        if: ${{ github.event.inputs.debug == 'true' }}
+        run: |
+          ./gradlew properties | grep APP_VERSION_CODE
+          ./gradlew properties | grep APP_VERSION_NAME
+
+      - name: Increment App versionName and versionCode
+        run: ./gradlew incrementVersion
+
+      - name: Print AppDemo versionCode e versionName POST incremented
+        if: ${{ github.event.inputs.debug == 'true' }}
+        run: |
+          ./gradlew properties | grep APP_VERSION_CODE
+          ./gradlew properties | grep APP_VERSION_NAME
 
       - name: Create JSON file from secret
         run: |
           # Create a directory to store the JSON file (optional)
-          mkdir -p config
+           mkdir -p config
           
-          ls -lrt
+           # Write the secret to a JSON file
+           echo '${{ secrets.APP_DISTR_FILE_CONTENT_KEY }}' > config/firebaseAppDistr.json
           
-          # Write the secret to a JSON file
-          echo '${{ secrets.APP_DISTR_FILE_CONTENT_KEY }}' > config/firebaseAppDistr.json
-          
-           ls -lrt
-          
-          # Export the path to the JSON file as an environment variable
-          echo "GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY=$PWD/config/firebaseAppDistr.json" >> $GITHUB_ENV
+           # Export the path to the JSON file as an environment variable
+           echo "GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY=$PWD/config/firebaseAppDistr.json" >> $GITHUB_ENV
 
       # Step 3: Print the environment variable to verify
       - name: Print the JSON path
@@ -54,11 +121,21 @@ jobs:
           echo "The JSON file is located at: $GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY"
           cat $GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY
 
+      - name: Assemble devDebug
+        run: ./gradlew uploadToAppDistributionUatDebug
+
+      - name: Assemble uatDebug
+        run: ./gradlew uploadToAppDistributionUatDebug
+
+      - name: Assemble preProdDebug
+        run: ./gradlew uploadToAppDistributionPreprodDebug
+
+      - name: Assemble prodDebug
+        run: ./gradlew uploadToAppDistributionProdDebug
+
       - name: Clean up JSON file and environment variable
         if: always()
         run: |
-          echo "Cleaning up..."
-          
           # Remove the file if it exists
           if [ -f "$GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY" ]; then
             rm $GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY
@@ -70,3 +147,30 @@ jobs:
           # Remove the environment variable
           echo "Removing the GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY environment variable."
           unset GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY
+
+      - name: Git Commit & Push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          
+          APP_VERSION_NAME=$(./gradlew properties | grep "APP_VERSION_NAME" | sed 's/.*: //')
+          APP_VERSION_CODE=$(./gradlew properties | grep "APP_VERSION_CODE" | sed 's/.*: //')
+          SDK_VERSION_CODE=$(./gradlew properties | grep "SDK_VERSION_CODE" | sed 's/.*: //')
+          BUILD_MAVEN_SDK_VERSION=$(./gradlew properties | grep "BUILD_MAVEN_SDK_VERSION" | sed 's/.*: //')
+
+          GIT_COMMIT_MESSAGE="build(release): AppDemo: versionName: $APP_VERSION_NAME, versionCode: $APP_VERSION_CODE. SDK: versionName: $BUILD_MAVEN_SDK_VERSION, versionCode: $SDK_VERSION_CODE. Maven version: $BUILD_MAVEN_SDK_VERSION"
+          
+          git add .
+          git commit -m "$GIT_COMMIT_MESSAGE"
+          git push
+
+      - name: Git Tag
+        if: ${{ github.event.inputs.mavenSdk == 'true' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          
+          GIT_TAG_NAME=$(./gradlew properties | grep "BUILD_MAVEN_SDK_VERSION" | sed 's/.*: //')
+          
+          git tag $GIT_TAG_NAME
+          git push origin $GIT_TAG_NAME
