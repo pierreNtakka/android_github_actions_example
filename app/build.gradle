@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.google.services)
-    alias(libs.plugins.app.distribution)
+    alias(libs.plugins.firebase.appdistribution)
 }
 
 apply from: "firebase-app-distribution.gradle"
