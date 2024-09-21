@@ -40,8 +40,8 @@ jobs:
           ./gradlew --version
 
       - name: Gradle All Tasks
-        run: ./gradlew tasks --all
         if: ${{ github.event.inputs.debug == 'true' }}
+        run: ./gradlew tasks --all
 
         ##### SDK Variant ###########
 
@@ -52,8 +52,8 @@ jobs:
           ./gradlew properties | grep BUILD_MAVEN_SDK_VERSION
 
       - name: Increment SDK versionName and versionCode
-        run: ./gradlew incrementMavenVersion
         if: ${{ github.event.inputs.mavenSdk == 'true' && github.event.inputs.mavenSdk == 'true' }}
+        run: ./gradlew incrementMavenVersion
 
       - name: Print SDK versionCode and versionName POST incremented
         if: ${{ github.event.inputs.debug == 'true' && github.event.inputs.mavenSdk == 'true'}}
@@ -62,20 +62,20 @@ jobs:
           ./gradlew properties | grep BUILD_MAVEN_SDK_VERSION
 
       - name: Assemble SDK devRelease
-        run: ./gradlew uploadToGitHubPkgDevRelease
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
+        run: ./gradlew uploadToGitHubPkgDevRelease
 
       - name: Assemble SDK uatRelease
-        run: ./gradlew uploadToGitHubPkgUatRelease
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
+        run: ./gradlew uploadToGitHubPkgUatRelease
 
       - name: Assemble SDK preProdRelease
-        run: ./gradlew uploadToGitHubPkgPreProdRelease
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
+        run: ./gradlew uploadToGitHubPkgPreProdRelease
 
       - name: Assemble SDK prodRelease
-        run: ./gradlew uploadToGitHubPkgProdRelease
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
+        run: ./gradlew uploadToGitHubPkgProdRelease
 
       ##### AppDemo Variant ###########
       - name: Print AppDemo versionCode e versionName PRE incremented
@@ -108,13 +108,13 @@ jobs:
       - name: Assemble and Upload to Firebase devDebug
         run: ./gradlew uploadToAppDistributionDevDebug
 
-      - name:  Assemble and Upload to Firebase uatDebug
+      - name: Assemble and Upload to Firebase uatDebug
         run: ./gradlew uploadToAppDistributionUatDebug
 
-      - name:  Assemble and Upload to Firebase preProdDebug
+      - name: Assemble and Upload to Firebase preProdDebug
         run: ./gradlew uploadToAppDistributionPreprodDebug
 
-      - name:  Assemble and Upload to Firebase prodDebug
+      - name: Assemble and Upload to Firebase prodDebug
         run: ./gradlew uploadToAppDistributionProdDebug
 
       - name: Clean up JSON file and environment variable
