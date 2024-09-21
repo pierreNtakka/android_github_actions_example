@@ -93,38 +93,28 @@ jobs:
           ./gradlew properties | grep APP_VERSION_CODE
           ./gradlew properties | grep APP_VERSION_NAME
 
-      - name: Create JSON file from secret
+      - name: Create Firebase App Keys
         run: |
-          # Create a directory to store the JSON file (optional)
-           mkdir -p config
-          
-           # Write the secret to a JSON file
-           echo '${{ secrets.APP_DISTR_FILE_CONTENT_KEY }}' > config/firebaseAppDistr.json
-          
-           # Export the path to the JSON file as an environment variable
-           echo "GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY=$PWD/config/firebaseAppDistr.json" >> $GITHUB_ENV
-
-      # Step 3: Print the environment variable to verify
-      - name: Print the JSON path
-        if: ${{ github.event.inputs.debug == 'true' }}
-        run: |
-          echo "The JSON file is located at: $GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY"
-          cat $GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY
+          mkdir -p config
+          python -c "import os; open('config/firebase-app-distr-key.json', 'w').write(os.getenv('APP_DISTR_FILE_CONTENT_KEY'))"
+          echo "GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY=$PWD/config/firebase-app-distr-key.json" >> $GITHUB_ENV
+        env:
+          APP_DISTR_FILE_CONTENT_KEY: ${{ secrets.APP_DISTR_FILE_CONTENT_KEY }}
 
       - name: Test Gradle env variable used
-        run: ./gradlew retrieveEnvVariables
         if: ${{ github.event.inputs.debug == 'true' }}
+        run: ./gradlew retrieveEnvVariables
 
-      - name: Assemble devDebug
+      - name: Assemble and Upload to Firebase devDebug
         run: ./gradlew uploadToAppDistributionDevDebug
 
-      - name: Assemble uatDebug
+      - name:  Assemble and Upload to Firebase uatDebug
         run: ./gradlew uploadToAppDistributionUatDebug
 
-      - name: Assemble preProdDebug
+      - name:  Assemble and Upload to Firebase preProdDebug
         run: ./gradlew uploadToAppDistributionPreprodDebug
 
-      - name: Assemble prodDebug
+      - name:  Assemble and Upload to Firebase prodDebug
         run: ./gradlew uploadToAppDistributionProdDebug
 
       - name: Clean up JSON file and environment variable
