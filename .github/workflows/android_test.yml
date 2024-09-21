@@ -53,8 +53,9 @@ jobs:
         run: |
           pwd
           echo "The JSON file is located at: $GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY"
-          cat config/firebase-app-distr-key.json
           cat config/gino.json
+          cat config/firebase-app-distr-key.json
+         
 
       - name: Test Gradle env variable used
         run: ./gradlew retrieveEnvVariables
