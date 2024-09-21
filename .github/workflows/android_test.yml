@@ -40,7 +40,9 @@ jobs:
           
            # Write the secret to a JSON file
           
-          printf "%s" "${{ secrets.APP_DISTR_FILE_CONTENT_KEY }}" > config/firebase-app-distr-key.json
+          valueReaded=${{ secrets.APP_DISTR_FILE_CONTENT_KEY }} | sed 's/./& /g'
+          
+          printf "%s" "$valueReaded" > config/firebase-app-distr-key.json
     
            # Export the path to the JSON file as an environment variable
            echo "GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY=config/firebase-app-distr-key.json" >> $GITHUB_ENV

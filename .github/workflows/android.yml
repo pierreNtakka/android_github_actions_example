@@ -116,7 +116,7 @@ jobs:
         if: ${{ github.event.inputs.debug == 'true' }}
 
       - name: Assemble devDebug
-        run: ./gradlew uploadToAppDistributionUatDebug
+        run: ./gradlew uploadToAppDistributionDevDebug
 
       - name: Assemble uatDebug
         run: ./gradlew uploadToAppDistributionUatDebug
