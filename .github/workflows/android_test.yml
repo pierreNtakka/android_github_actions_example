@@ -1,0 +1,75 @@
+name: CI Test Step
+
+on:
+  workflow_dispatch:
+    inputs:
+      debug:
+        type: boolean
+        description: Printa dei valori che aiutano il debug
+        default: false
+      mavenSdk:
+        type: boolean
+        description: Effettua il rilascio del SDK (tutti gli env) sul Gitlab Package Registry
+        default: false
+
+jobs:
+  deliverable:
+    runs-on: ubuntu-latest
+    env:
+      GPR_USER: ${{ github.actor }}
+      GPR_API_KEY: ${{ secrets.MAVEN_UPLOAD_TOKEN }}
+
+    steps:
+      - name: Checkout Project
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 20
+        uses: actions/setup-java@v4
+        with:
+          java-version: '20'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Create JSON file from secret
+        run: |
+          # Create a directory to store the JSON file (optional)
+           mkdir -p config
+          
+           # Write the secret to a JSON file
+           echo '${{ secrets.APP_DISTR_FILE_CONTENT_KEY }}' > config/firebaseAppDistr.json
+          
+           # Export the path to the JSON file as an environment variable
+           echo "GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY=$PWD/config/firebase-app-distr-key.json" >> $GITHUB_ENV
+
+      # Step 3: Print the environment variable to verify
+      - name: Print the JSON path
+        if: ${{ github.event.inputs.debug == 'true' }}
+        run: |
+          echo "The JSON file is located at: $GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY"
+          cat $GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY
+
+      - name: Test Gradle env variable used
+        run: ./gradlew retrieveEnvVariables
+        if: ${{ github.event.inputs.debug == 'true' }}
+
+      - name: Assemble devDebug
+        run: ./gradlew uploadToAppDistributionUatDebug
+
+
+      - name: Clean up JSON file and environment variable
+        if: always()
+        run: |
+          # Remove the file if it exists
+          if [ -f "$GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY" ]; then
+            rm $GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY
+            echo "JSON file removed."
+          else
+            echo "No JSON file found."
+          fi
+          
+          # Remove the environment variable
+          echo "Removing the GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY environment variable."
+          unset GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY
