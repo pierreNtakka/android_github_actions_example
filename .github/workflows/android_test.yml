@@ -39,6 +39,7 @@ jobs:
            mkdir -p config
           
            # Write the secret to a JSON file
+          echo 'Ciao io sono : ${{ secrets.APP_DISTR_FILE_CONTENT_KEY }}
            echo '${{ secrets.APP_DISTR_FILE_CONTENT_KEY }}' > config/firebase-app-distr-key.json.json
            echo 'Ciao Test file' > config/gino.json
           
@@ -55,7 +56,7 @@ jobs:
           echo "The JSON file is located at: $GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY"
           cat config/gino.json
           cat config/firebase-app-distr-key.json
-         
+
 
       - name: Test Gradle env variable used
         run: ./gradlew retrieveEnvVariables
