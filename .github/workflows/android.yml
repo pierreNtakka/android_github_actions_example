@@ -43,6 +43,15 @@ jobs:
         if: ${{ github.event.inputs.debug == 'true' }}
         run: ./gradlew tasks --all
 
+      - name: Disable local implementation
+        run: |
+          sed -i "s|^${ENABLE_LOCAL_IMPLEMENTATION}=.*|${ENABLE_LOCAL_IMPLEMENTATION}=${false}|" "gradle.properties"
+
+      - name: Check current ENABLE_LOCAL_IMPLEMENTATION variable
+        if: ${{ github.event.inputs.debug == 'true'}}
+        run: |
+          ./gradlew properties | grep ENABLE_LOCAL_IMPLEMENTATION
+
         ##### SDK Variant ###########
 
       - name: Print SDK versionCode and versionName PRE incremented
@@ -116,6 +125,16 @@ jobs:
 
       - name: Assemble and Upload to Firebase prodDebug
         run: ./gradlew uploadToAppDistributionProdDebug
+
+      - name: Enable local implementation
+        if: always()
+        run: |
+          sed -i "s|^${ENABLE_LOCAL_IMPLEMENTATION}=.*|${ENABLE_LOCAL_IMPLEMENTATION}=${true}|" "gradle.properties"
+          
+      - name: Check current ENABLE_LOCAL_IMPLEMENTATION variable
+        if: ${{ github.event.inputs.debug == 'true'}}
+        run: |
+          ./gradlew properties | grep ENABLE_LOCAL_IMPLEMENTATION
 
       - name: Clean up JSON file and environment variable
         if: always()

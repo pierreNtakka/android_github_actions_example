@@ -4,7 +4,7 @@ def firebaseAppDistributionPrefixTaskName = "appDistributionUpload"
 def flavorAppDistrPrefixTaskName = "uploadToAppDistribution"
 def uploadToFirebaseTasksName = new ArrayList<String>()
 
-task incrementVersion(name: this.name) {
+tasks.register('incrementVersion') {
     doLast {
         ant.propertyfile(file: "../gradle.properties") {
 

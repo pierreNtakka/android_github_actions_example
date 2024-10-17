@@ -48,7 +48,7 @@ publishing {
     }
 }
 
-def addDependency(dependency, dependenciesNode) {
+static def addDependency(dependency, dependenciesNode) {
     def dependencyNode = dependenciesNode.appendNode('dependency')
     dependencyNode.appendNode('groupId', dependency.group)
     dependencyNode.appendNode('artifactId', dependency.name)
@@ -84,7 +84,8 @@ android.libraryVariants.configureEach { variant ->
 }
 
 
-task incrementMavenVersion(name: this.name, group: mavenDistrTaskGroupName) {
+tasks.register('incrementMavenVersion') {
+    group = mavenDistrTaskGroupName
     description "Increment the api-module SDK versionCode and versionName"
     doLast {
         ant.propertyfile(file: "../gradle.properties") {
