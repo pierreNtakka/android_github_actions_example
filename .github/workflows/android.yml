@@ -45,7 +45,7 @@ jobs:
 
       - name: Disable local implementation
         run: |
-          sed -i "s|^${ENABLE_LOCAL_IMPLEMENTATION}=.*|${ENABLE_LOCAL_IMPLEMENTATION}=${false}|" "gradle.properties"
+          sed -i "s|^ENABLE_LOCAL_IMPLEMENTATION=.*|ENABLE_LOCAL_IMPLEMENTATION=false|" "gradle.properties"
 
       - name: Check current ENABLE_LOCAL_IMPLEMENTATION variable
         if: ${{ github.event.inputs.debug == 'true'}}
@@ -129,7 +129,7 @@ jobs:
       - name: Enable local implementation
         if: always()
         run: |
-          sed -i "s|^${ENABLE_LOCAL_IMPLEMENTATION}=.*|${ENABLE_LOCAL_IMPLEMENTATION}=${true}|" "gradle.properties"
+          sed -i "s|^ENABLE_LOCAL_IMPLEMENTATION=.*|ENABLE_LOCAL_IMPLEMENTATION=true|" "gradle.properties"
           
       - name: Check current ENABLE_LOCAL_IMPLEMENTATION variable
         if: ${{ github.event.inputs.debug == 'true'}}
