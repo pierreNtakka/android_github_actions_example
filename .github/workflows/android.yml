@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GPR_USER: ${{ github.actor }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - name: Checkout Project
@@ -114,23 +115,15 @@ jobs:
         run: ./gradlew retrieveEnvVariables
 
       - name: Assemble and Upload to Firebase devDebug
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew uploadToAppDistributionDevDebug
 
       - name: Assemble and Upload to Firebase uatDebug
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew uploadToAppDistributionUatDebug
 
       - name: Assemble and Upload to Firebase preProdDebug
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew uploadToAppDistributionPreprodDebug
 
       - name: Assemble and Upload to Firebase prodDebug
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew uploadToAppDistributionProdDebug
 
       - name: Enable local implementation
