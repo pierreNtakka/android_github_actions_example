@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GPR_USER: ${{ github.actor }}
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - name: Checkout Project
@@ -130,7 +130,7 @@ jobs:
         if: always()
         run: |
           sed -i "s|^ENABLE_LOCAL_IMPLEMENTATION=.*|ENABLE_LOCAL_IMPLEMENTATION=true|" "gradle.properties"
-          
+
       - name: Check current ENABLE_LOCAL_IMPLEMENTATION variable
         if: ${{ github.event.inputs.debug == 'true'}}
         run: |
@@ -168,6 +168,7 @@ jobs:
           git push
 
       - name: Git Tag
+        id: create_git_tag
         if: ${{ github.event.inputs.mavenSdk == 'true' }}
         run: |
           git config user.name "github-actions[bot]"
@@ -175,5 +176,23 @@ jobs:
           
           GIT_TAG_NAME=$(./gradlew properties | grep "BUILD_MAVEN_SDK_VERSION" | sed 's/.*: //')
           
+          echo "GIT_TAG_NAME=$GIT_TAG_NAME" >> $GITHUB_OUTPUT
+          
           git tag $GIT_TAG_NAME
           git push origin $GIT_TAG_NAME
+
+      - name: Create Release
+        id: create_release
+        if: ${{ github.event.inputs.mavenSdk == 'true' }}
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.create_git_tag.outputs.GIT_TAG_NAME }}
+          release_name: Release ${{ steps.create_git_tag.outputs.GIT_TAG_NAME }}
+          body: |
+            Changes in this Release
+            - First Change
+            - Second Change
+          draft: false
+          prerelease: false
