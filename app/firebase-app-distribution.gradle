@@ -60,7 +60,6 @@ android.applicationVariants.configureEach { variant ->
 tasks.register("retrieveEnvVariables") {
     description "Increment the api-module SDK versionCode and versionName"
     doLast {
-        println("Valore GPR_API_KEY=${System.getenv("GPR_API_KEY")}")
         println("Valore GPR_USER=${System.getenv("GPR_USER")}")
         println("Valore GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY=${System.getenv("GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY")}")
     }

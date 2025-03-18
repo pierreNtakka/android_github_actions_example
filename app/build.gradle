@@ -53,7 +53,7 @@ android {
 
     firebaseAppDistribution {
         artifactType = "APK"
-        //serviceCredentialsFile = System.getenv("GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY")
+        serviceCredentialsFile = System.getenv("GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY")
     }
 
     flavorDimensions = ["example"]
