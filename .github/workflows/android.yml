@@ -115,22 +115,22 @@ jobs:
 
       - name: Assemble and Upload to Firebase devDebug
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew uploadToAppDistributionDevDebug
 
       - name: Assemble and Upload to Firebase uatDebug
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew uploadToAppDistributionUatDebug
 
       - name: Assemble and Upload to Firebase preProdDebug
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew uploadToAppDistributionPreprodDebug
 
       - name: Assemble and Upload to Firebase prodDebug
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew uploadToAppDistributionProdDebug
 
       - name: Enable local implementation
