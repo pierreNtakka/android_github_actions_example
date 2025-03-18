@@ -42,7 +42,7 @@ publishing {
             url = uri("https://maven.pkg.github.com/pierreNtakka/android_github_actions_example")
             credentials {
                 username = "${System.getenv("GPR_USER")}"
-                password = "${System.getenv("GPR_API_KEY")}"
+                password = "${System.getenv("GITHUB_TOKEN")}"
             }
         }
     }
