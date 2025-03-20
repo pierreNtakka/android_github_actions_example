@@ -131,12 +131,12 @@ jobs:
       - name: Commit And Push the incremented Version
         run: |
           
-          APP_VERSION_CODE=$(./gradlew properties | grep "APP_VERSION_CODE" | sed 's/.*: //')
+          APP_VERSION_CODE=$(./gradlew properties | grep "APP_DEMO_VERSION_CODE" | sed 's/.*: //')
           BUILD_MAVEN_SDK_VERSION=$(./gradlew properties | grep "BUILD_MAVEN_SDK_VERSION" | sed 's/.*: //')
           RELEASE_VERSION_NAME=$(./gradlew properties | grep "RELEASE_VERSION_NAME" | sed 's/.*: //')
           
           git add .
-          git commit -m "chore: Update app versionCode to: $APP_VERSION_CODE and versionName: $BUILD_MAVEN_SDK_VERSION and maven version $RELEASE_VERSION_NAME"
+          git commit -m "chore: Update app versionCode to: $APP_VERSION_CODE and versionName: $RELEASE_VERSION_NAME and maven version BUILD_MAVEN_SDK_VERSION"
           git push
 
   upload-app-demo:
@@ -282,8 +282,9 @@ jobs:
           git push origin $GIT_TAG_NAME
 
       - name: Create Release
-        id: create_release
         uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ steps.create_git_tag.outputs.GIT_TAG_NAME }}
           release_name: Release ${{ steps.create_git_tag.outputs.GIT_TAG_NAME }}
