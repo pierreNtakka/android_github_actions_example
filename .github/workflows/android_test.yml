@@ -263,7 +263,7 @@ jobs:
       - name: Git merge ${{ needs.create-branch.outputs.branch_name }}" into current
         run: |
           git checkout ${{ needs.create-branch.outputs.branch_name }}"
-          git merge --no-ff ${{ needs.create-branch.outputs.branch_name }}"
+          git merge ${{ needs.create-branch.outputs.branch_name }}"
           sed -i "s|^ENABLE_LOCAL_IMPLEMENTATION=.*|ENABLE_LOCAL_IMPLEMENTATION=true|" "gradle.properties"
           git add .
           git commit -m "chore: enable local implementation"
