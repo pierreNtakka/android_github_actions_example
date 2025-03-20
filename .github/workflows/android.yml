@@ -97,28 +97,52 @@ jobs:
         if: ${{ github.event.inputs.debug == 'true'}}
         run: |
           gradlePropertyFileName = "gradle.properties"
-          enableLocalImpl=$(grep -E "^[^#]*ENABLE_LOCAL_IMPLEMENTATION=" $gradlePropertyFileName | cut -d'=' -f2-)
+          enableLocalImpl=$(grep -E "^[^#]*ENABLE_LOCAL_IMPLEMENTATION=" "$gradlePropertyFileName" | cut -d'=' -f2-)
           echo "${enableLocalImpl}"
 
       - name: Print Version properties PRE incremented
         if: ${{ github.event.inputs.debug == 'true'}}
         run: |
-          gradlePropertyFileName = "gradle.properties"
-          echo "$(grep -E "^[^#]*APP_DEMO_VERSION_CODE=" $gradlePropertyFileName | cut -d'=' -f2-)"
-          echo "$(grep -E "^[^#]*RELEASE_VERSION_NAME=" $gradlePropertyFileName | cut -d'=' -f2-)"
-          echo "$(grep -E "^[^#]*BUILD_MAVEN_SDK_VERSION=" $gradlePropertyFileName | cut -d'=' -f2-)"
+          gradlePropertyFileName="gradle.properties"
+          appDemoVersionCode=$(grep -E "^[^#]*APP_DEMO_VERSION_CODE=" "$gradlePropertyFileName" | cut -d'=' -f2-)
+          releaseVersionName=$(grep -E "^[^#]*RELEASE_VERSION_NAME=" "$gradlePropertyFileName" | cut -d'=' -f2-)
+          buildMavenSdkVersion=$(grep -E "^[^#]*BUILD_MAVEN_SDK_VERSION=" "$gradlePropertyFileName" | cut -d'=' -f2-)
+          echo "APP_DEMO_VERSION_CODE=$appDemoVersionCode"
+          echo "RELEASE_VERSION_NAME=$releaseVersionName"
+          echo "BUILD_MAVEN_SDK_VERSION=$buildMavenSdkVersion"
 
       - name: Increment App and SDK Version
         run: |
-          ./gradlew :myTestLibrary:incrementMavenVersion
-          ./gradlew :app:incrementVersion
+          gradleProperties="gradle.properties"
+      
+          IS_FIRST_RELEASE=$(grep -E "^IS_FIRST_RELEASE=" "$gradleProperties" | cut -d'=' -f2)
+          IS_FIRST_MAVEN_RELEASE=$(grep -E "^IS_FIRST_MAVEN_RELEASE=" "$gradleProperties" | cut -d'=' -f2)
+          APP_DEMO_VERSION_CODE=$(grep -E "^APP_DEMO_VERSION_CODE=" "$gradleProperties" | cut -d'=' -f2)
+          BUILD_MAVEN_SDK_VERSION=$(grep -E "^BUILD_MAVEN_SDK_VERSION=" "$gradleProperties" | cut -d'=' -f2)
+      
+          if [ "$IS_FIRST_RELEASE" == "true" ]; then
+            NEW_APP_DEMO_VERSION_CODE=$((APP_DEMO_VERSION_CODE + 1))
+            sed -i "s/^APP_DEMO_VERSION_CODE=.*/APP_DEMO_VERSION_CODE=$NEW_APP_DEMO_VERSION_CODE/" "$gradleProperties"
+          fi
+      
+          if [ "$IS_FIRST_MAVEN_RELEASE" == "true" ]; then
+            PREFIX=$(echo "$BUILD_MAVEN_SDK_VERSION" | rev | cut -d'.' -f2- | rev) 
+            LAST_NUMBER=$(echo "$BUILD_MAVEN_SDK_VERSION" | rev | cut -d'.' -f1 | rev) 
+            NEW_LAST_NUMBER=$((LAST_NUMBER + 1))
+            NEW_BUILD_MAVEN_SDK_VERSION="$PREFIX.$NEW_LAST_NUMBER"
+            sed -i "s/^BUILD_MAVEN_SDK_VERSION=.*/BUILD_MAVEN_SDK_VERSION=$NEW_BUILD_MAVEN_SDK_VERSION/" "$gradleProperties"
+          fi
 
       - name: Print Version properties POST incremented
         if: ${{ github.event.inputs.debug == 'true'}}
         run: |
-          ./gradlew properties | grep APP_DEMO_VERSION_CODE
-          ./gradlew properties | grep RELEASE_VERSION_NAME
-          ./gradlew properties | grep BUILD_MAVEN_SDK_VERSION
+          gradlePropertyFileName="gradle.properties"
+          appDemoVersionCode=$(grep -E "^[^#]*APP_DEMO_VERSION_CODE=" "$gradlePropertyFileName" | cut -d'=' -f2-)
+          releaseVersionName=$(grep -E "^[^#]*RELEASE_VERSION_NAME=" "$gradlePropertyFileName" | cut -d'=' -f2-)
+          buildMavenSdkVersion=$(grep -E "^[^#]*BUILD_MAVEN_SDK_VERSION=" "$gradlePropertyFileName" | cut -d'=' -f2-)
+          echo "APP_DEMO_VERSION_CODE=$appDemoVersionCode"
+          echo "RELEASE_VERSION_NAME=$releaseVersionName"
+          echo "BUILD_MAVEN_SDK_VERSION=$buildMavenSdkVersion"
 
       - name: Set up Git
         run: |
@@ -127,13 +151,12 @@ jobs:
 
       - name: Commit And Push the incremented Version
         run: |
-          
-          APP_VERSION_CODE=$(./gradlew properties | grep "APP_DEMO_VERSION_CODE" | sed 's/.*: //')
-          BUILD_MAVEN_SDK_VERSION=$(./gradlew properties | grep "BUILD_MAVEN_SDK_VERSION" | sed 's/.*: //')
-          RELEASE_VERSION_NAME=$(./gradlew properties | grep "RELEASE_VERSION_NAME" | sed 's/.*: //')
+          appDemoVersionCode=$(grep -E "^[^#]*APP_DEMO_VERSION_CODE=" "$gradlePropertyFileName" | cut -d'=' -f2-)
+          releaseVersionName=$(grep -E "^[^#]*RELEASE_VERSION_NAME=" "$gradlePropertyFileName" | cut -d'=' -f2-)
+          buildMavenSdkVersion=$(grep -E "^[^#]*BUILD_MAVEN_SDK_VERSION=" "$gradlePropertyFileName" | cut -d'=' -f2-)
           
           git add .
-          git commit -m "chore: Update app versionCode to: $APP_VERSION_CODE and versionName: $RELEASE_VERSION_NAME and maven version $BUILD_MAVEN_SDK_VERSION"
+          git commit -m "chore: Update app versionCode to: appDemoVersionCode and versionName: $releaseVersionName and maven version $buildMavenSdkVersion"
           git push
 
   upload-app-demo:
