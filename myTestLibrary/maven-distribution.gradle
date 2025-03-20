@@ -5,6 +5,7 @@ def refBuildType = "release"
 def mavenSdkPublicationTaskNamePrefix = "myTestLibraryLib"
 def mavenPublicationPlaceholderTaskName = "publish${mavenSdkPublicationTaskNamePrefix.capitalize()}%sPublicationToGitHubPkgRepository"
 def flavorUploadMavenPrefixTaskName = "uploadToGitHubPkg"
+def uploadToGitHubTasksName = new ArrayList<String>()
 
 publishing {
     publications {
@@ -25,12 +26,21 @@ publishing {
 
                         def dependenciesNode = asNode().appendNode('dependencies')
                         configurations.implementation.allDependencies.each {
+                            println "BUILD implementation  node: ${it.group}:${it.name}:${it.version}"
                             addDependency(it, dependenciesNode)
                         }
 
-                        configurations.getByName("${flavorName}Implementation").allDependencies.each {
+                        configurations.getByName("${flavorFirstDimension}Implementation").allDependencies.each {
+                            println "BUILD ${flavorFirstDimension}Implementation node: ${it.group}:${it.name}:${it.version}"
                             addDependency(it, dependenciesNode)
                         }
+
+
+                        configurations.getByName("${flavorFirstDimension}${flavorSecondDimension.capitalize()}Implementation").allDependencies.each {
+                            println "BUILD ${flavorFirstDimension}${flavorSecondDimension.capitalize()}Implementation node: ${it.group}:${it.name}:${it.version}"
+                            addDependency(it, dependenciesNode)
+                        }
+
                     }
                 }
             }
@@ -67,6 +77,8 @@ android.libraryVariants.configureEach { variant ->
         def mavenPublicationTaskName = String.format(mavenPublicationPlaceholderTaskName, variantName)
         tasks.named(mavenPublicationTaskName).get().dependsOn(assembleVariantName)
 
+        uploadToGitHubTasksName.add(mavenPublicationTaskName)
+
         tasks.register("${flavorUploadMavenPrefixTaskName}${variantName}") {
             group = mavenDistrTaskGroupName
             description = "Assemble ${variantName} and publish the ${variantName} SDK to Maven Repository"
@@ -76,6 +88,7 @@ android.libraryVariants.configureEach { variant ->
             dependsOn mavenPublicationTaskName
 
             tasks.named(assembleVariantName).get().dependsOn(unitTestTaskName)
+
             tasks.named(unitTestTaskName).get().mustRunAfter(clean)
             tasks.named(assembleVariantName).get().mustRunAfter(unitTestTaskName)
             tasks.named(mavenPublicationTaskName).get().mustRunAfter(assembleVariantName)
@@ -90,19 +103,39 @@ tasks.register('incrementMavenVersion') {
     doLast {
         ant.propertyfile(file: "../gradle.properties") {
 
+            def isFirstRelease = IS_FIRST_MAVEN_RELEASE.toBoolean()
+
+            if (!isFirstRelease) {
+                def splittedVersion = BUILD_MAVEN_SDK_VERSION.split("\\.")
+
+                def major = splittedVersion[0].toString()
+                def minor = splittedVersion[1].toString()
+                def patch = splittedVersion[2].toString()
+                def buildNumber = splittedVersion[3].toInteger() + 1
+
+                BUILD_MAVEN_SDK_VERSION = "${major}.${minor}.${patch}.${buildNumber}"
+                entry(key: "BUILD_MAVEN_SDK_VERSION", value: BUILD_MAVEN_SDK_VERSION)
+            }
+        }
+    }
+}
+
+
+tasks.register('incrementMavenVersionNextRelease') {
+    group = mavenDistrTaskGroupName
+    description "Set to false the gradle properties IS_FIRST_MAVEN_RELEASE only if the the SDK VersionCode is XXXX000 and the BUILD_MAVEN_SDK_VERSION is XX.XX.0.0"
+    doLast {
+        ant.propertyfile(file: "../gradle.properties") {
+
             def splittedVersion = BUILD_MAVEN_SDK_VERSION.split("\\.")
+            def buildNumber = splittedVersion[3].toInteger()
 
-            def major = splittedVersion[0].toInteger()
-            def minor = splittedVersion[1].toInteger()
-            def patch = splittedVersion[2].toInteger()
-            def buildNumber = splittedVersion[3].toInteger() + 1
-
-            BUILD_MAVEN_SDK_VERSION = "${major}.${minor}.${patch}.${buildNumber}"
-            entry(key: "BUILD_MAVEN_SDK_VERSION", value: BUILD_MAVEN_SDK_VERSION)
-
-            def sdkVersionCode = SDK_VERSION_CODE.toInteger() + 1
-            SDK_VERSION_CODE = sdkVersionCode
-            entry(key: "SDK_VERSION_CODE", value: SDK_VERSION_CODE.toInteger())
+            if (buildNumber == 0) {
+                def isFirstRelease = IS_FIRST_MAVEN_RELEASE.toBoolean()
+                isFirstRelease = false
+                IS_FIRST_MAVEN_RELEASE = isFirstRelease
+                entry(key: "IS_FIRST_MAVEN_RELEASE", value: IS_FIRST_MAVEN_RELEASE.toString())
+            }
         }
     }
 }

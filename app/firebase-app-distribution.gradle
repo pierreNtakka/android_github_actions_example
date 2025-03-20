@@ -8,18 +8,32 @@ tasks.register('incrementVersion') {
     doLast {
         ant.propertyfile(file: "../gradle.properties") {
 
-            def appDemoVersionCode = APP_VERSION_CODE.toInteger() + 1
-            APP_VERSION_CODE = appDemoVersionCode
-            entry(key: "APP_VERSION_CODE", value: APP_VERSION_CODE.toString())
+            def isFirstRelease = IS_FIRST_RELEASE.toBoolean()
 
-            def splittedVersion = APP_VERSION_NAME.split("\\.")
+            if (!isFirstRelease) {
+                def appDemoVersionCode = APP_DEMO_VERSION_CODE.toInteger()
+                appDemoVersionCode = appDemoVersionCode + 1
+                APP_DEMO_VERSION_CODE = appDemoVersionCode
+                entry(key: "APP_DEMO_VERSION_CODE", value: APP_DEMO_VERSION_CODE.toString())
+            }
 
-            def major = splittedVersion[0].toInteger()
-            def minor = splittedVersion[1].toInteger()
-            def patch = splittedVersion[2].toInteger() + 1
+        }
+    }
+}
 
-            APP_VERSION_NAME = "${major}.${minor}.${patch}"
-            entry(key: "APP_VERSION_NAME", value: APP_VERSION_NAME)
+tasks.register('incrementVersionNextRelease') {
+    description "Increment versionName and versionCode of App and SDK"
+    doLast {
+        ant.propertyfile(file: "../gradle.properties") {
+
+            def appDemoVersionCode = APP_DEMO_VERSION_CODE.toInteger()
+
+            if (appDemoVersionCode == 1) {
+                def isFirstRelease = IS_FIRST_RELEASE.toBoolean()
+                isFirstRelease = false
+                IS_FIRST_RELEASE = isFirstRelease
+                entry(key: "IS_FIRST_RELEASE", value: IS_FIRST_RELEASE.toString())
+            }
         }
     }
 }
