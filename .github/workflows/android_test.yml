@@ -32,7 +32,7 @@ jobs:
           echo "New branch $NEW_BRANCH created and pushed"
 
   increment-version:
-    needs: [ create-branch, testing ]
+    needs: [ create-branch ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}"
@@ -148,7 +148,7 @@ jobs:
 
 
   create-tag:
-    needs: [ create-branch, testing, increment-version, upload-sdk]
+    needs: [ create-branch, testing, increment-version, upload-sdk ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch
