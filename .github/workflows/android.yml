@@ -156,7 +156,7 @@ jobs:
           buildMavenSdkVersion=$(grep -E "^[^#]*BUILD_MAVEN_SDK_VERSION=" "$gradlePropertyFileName" | cut -d'=' -f2-)
           
           git add .
-          git commit -m "chore: Update app versionCode to: appDemoVersionCode and versionName: $releaseVersionName and maven version $buildMavenSdkVersion"
+          git commit -m "chore: Update app versionCode to: $appDemoVersionCode and versionName: $releaseVersionName and maven version $buildMavenSdkVersion"
           git push
 
   upload-app-demo:
@@ -286,7 +286,9 @@ jobs:
           git merge origin/${{ needs.create-branch.outputs.branch_name }}
           
           sed -i "s|^ENABLE_LOCAL_IMPLEMENTATION=.*|ENABLE_LOCAL_IMPLEMENTATION=true|" "gradle.properties"
-          
+          sed -i "s|^IS_FIRST_RELEASE=.*|IS_FIRST_RELEASE=false|" "gradle.properties"
+          sed -i "s|^IS_FIRST_RELEASE=.*|IS_FIRST_RELEASE=false|" "gradle.properties"
+
           git add .
           git commit -m "chore: enable local implementation"
           git push
