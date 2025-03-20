@@ -204,6 +204,9 @@ jobs:
   upload-sdk:
     needs: [ create-branch, testing, increment-version ]
     runs-on: ubuntu-latest
+    env:
+      GPR_USER: ${{ github.actor }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     strategy:
       matrix:
         flavour: [ DevRelease, UatRelease, PreProdRelease, ProdRelease ]
