@@ -66,8 +66,6 @@ jobs:
           java --version
           ./gradlew --version
 
-
-
       - name: Execute testing
         run: |
           ./gradlew :app:testing
@@ -97,8 +95,6 @@ jobs:
           java --version
           ./gradlew --version
 
-
-
       - name: Disable local implementation
         run: |
           sed -i "s|^ENABLE_LOCAL_IMPLEMENTATION=.*|ENABLE_LOCAL_IMPLEMENTATION=false|" "gradle.properties"
@@ -126,6 +122,11 @@ jobs:
           ./gradlew properties | grep APP_DEMO_VERSION_CODE
           ./gradlew properties | grep RELEASE_VERSION_NAME
           ./gradlew properties | grep BUILD_MAVEN_SDK_VERSION
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Commit And Push the incremented Version
         run: |
