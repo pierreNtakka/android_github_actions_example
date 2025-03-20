@@ -45,6 +45,11 @@ jobs:
     needs: create-branch
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout branch "testing"
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.create-branch.outputs.working_branch }}
+
       - name: Set up JDK 20
         uses: actions/setup-java@v4
         with:
@@ -61,10 +66,7 @@ jobs:
           java --version
           ./gradlew --version
 
-      - name: Checkout branch "testing"
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ needs.create-branch.outputs.working_branch }}
+
 
       - name: Execute testing
         run: |
