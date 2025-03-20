@@ -30,14 +30,8 @@ publishing {
                             addDependency(it, dependenciesNode)
                         }
 
-                        configurations.getByName("${flavorFirstDimension}Implementation").allDependencies.each {
-                            println "BUILD ${flavorFirstDimension}Implementation node: ${it.group}:${it.name}:${it.version}"
-                            addDependency(it, dependenciesNode)
-                        }
-
-
-                        configurations.getByName("${flavorFirstDimension}${flavorSecondDimension.capitalize()}Implementation").allDependencies.each {
-                            println "BUILD ${flavorFirstDimension}${flavorSecondDimension.capitalize()}Implementation node: ${it.group}:${it.name}:${it.version}"
+                        configurations.getByName("${flavorName}Implementation").allDependencies.each {
+                            println "BUILD ${flavorName}Implementation node: ${it.group}:${it.name}:${it.version}"
                             addDependency(it, dependenciesNode)
                         }
 
