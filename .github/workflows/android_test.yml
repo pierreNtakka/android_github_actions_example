@@ -145,8 +145,9 @@ jobs:
   upload-app-demo:
     needs: [ create-branch, testing, increment-version ]
     runs-on: ubuntu-latest
-    matrix:
-      flavour: [ DevDebug, UatDebug, PreProdDebug, ProdDebug ]
+    strategy:
+      matrix:
+        flavour: [ DevDebug, UatDebug, PreProdDebug, ProdDebug ]
     steps:
       - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}"
         uses: actions/checkout@v4
