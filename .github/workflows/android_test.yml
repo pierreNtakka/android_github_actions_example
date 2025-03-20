@@ -271,14 +271,27 @@ jobs:
           git push
 
       - name: Git Tag
+        id: create_git_tag
         run: |
           GIT_TAG_NAME=$(./gradlew properties | grep "BUILD_MAVEN_SDK_VERSION" | sed 's/.*: //')
           
+          echo "GIT_TAG_NAME=$GIT_TAG_NAME" >> $GITHUB_OUTPUT
+          
           git tag $GIT_TAG_NAME
           git push origin $GIT_TAG_NAME
-  
-  
-  
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ steps.create_git_tag.outputs.GIT_TAG_NAME }}
+          release_name: Release ${{ steps.create_git_tag.outputs.GIT_TAG_NAME }}
+          body: |
+            Changes in this Release
+            - First Change
+            - Second Change
+          draft: false
+          prerelease: false
 
   clean:
     runs-on: ubuntu-latest
