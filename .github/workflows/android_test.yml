@@ -262,7 +262,10 @@ jobs:
 
       - name: Execute merge
         run: |
-          git merge ${{ needs.create-branch.outputs.branch_name }}
+          git merge origin/${{ needs.create-branch.outputs.branch_name }}
+          sed -i "s|^ENABLE_LOCAL_IMPLEMENTATION=.*|ENABLE_LOCAL_IMPLEMENTATION=true|" "gradle.properties"
+          git add .
+          git commit -m "chore: enable local implementation"
           git push
 
       - name: Git Tag
