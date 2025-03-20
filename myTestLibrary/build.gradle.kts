@@ -1,3 +1,5 @@
+import org.gradle.configurationcache.extensions.capitalized
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -70,9 +72,8 @@ android {
             .filter { this.buildType.name == "release" }
             .map { it as com.android.build.gradle.internal.api.LibraryVariantOutputImpl }
             .forEach { output ->
-                this.productFlavors.get(0)
                 var aarfileName =
-                    "myTestLibrary-${this.productFlavors[0].name}-${this.buildType.name}"
+                    "myTestLibrary-${this.productFlavors[0].name}${this.buildType.name.capitalized()}"
                 aarfileName += ".aar"
                 println("aarFilenName=$aarfileName}")
                 output.outputFileName = aarfileName
