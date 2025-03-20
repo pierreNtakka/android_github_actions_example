@@ -23,9 +23,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Git
+      - name: Read Properties
         run: |
           gradlePropertyFileName="gradle.properties"
-          echo "$(grep -E "^[^#]*APP_DEMO_VERSION_CODE=" "$gradlePropertyFileName" | cut -d'=' -f2-)"
-          echo "$(grep -E "^[^#]*RELEASE_VERSION_NAME=" "$gradlePropertyFileName" | cut -d'=' -f2-)"
-          echo "$(grep -E "^[^#]*BUILD_MAVEN_SDK_VERSION=" "$gradlePropertyFileName" | cut -d'=' -f2-)"
+          appDemoVersionCode=$(grep -E "^[^#]*APP_DEMO_VERSION_CODE=" "$gradlePropertyFileName" | cut -d'=' -f2-)
+          releaseVersionName=$(grep -E "^[^#]*RELEASE_VERSION_NAME=" "$gradlePropertyFileName" | cut -d'=' -f2-)
+          buildMavenSdkVersion=$(grep -E "^[^#]*BUILD_MAVEN_SDK_VERSION=" "$gradlePropertyFileName" | cut -d'=' -f2-)
+          echo "APP_DEMO_VERSION_CODE=$appDemoVersionCode"
+          echo "RELEASE_VERSION_NAME=$releaseVersionName"
+          echo "BUILD_MAVEN_SDK_VERSION=$buildMavenSdkVersion"
