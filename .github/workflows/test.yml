@@ -25,8 +25,7 @@ jobs:
 
       - name: Set up Git
         run: |
-          gradlePropertyFileName = "gradle.properties"
-          echo "$(grep -E "^[^#]*APP_DEMO_VERSION_CODE=" $gradlePropertyFileName | cut -d'=' -f2-)"
-          echo "$(grep -E "^[^#]*RELEASE_VERSION_NAME=" $gradlePropertyFileName | cut -d'=' -f2-)"
-          echo "$(grep -E "^[^#]*BUILD_MAVEN_SDK_VERSION=" $gradlePropertyFileName | cut -d'=' -f2-)"
-          echo "Account: ${{ github.event.inputs.account }}"
+          gradlePropertyFileName="gradle.properties"
+          echo "$(grep -E "^[^#]*APP_DEMO_VERSION_CODE=" "$gradlePropertyFileName" | cut -d'=' -f2-)"
+          echo "$(grep -E "^[^#]*RELEASE_VERSION_NAME=" "$gradlePropertyFileName" | cut -d'=' -f2-)"
+          echo "$(grep -E "^[^#]*BUILD_MAVEN_SDK_VERSION=" "$gradlePropertyFileName" | cut -d'=' -f2-)"
