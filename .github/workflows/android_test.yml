@@ -108,7 +108,7 @@ jobs:
 
 
   upload-sdk:
-    needs: [ create-branch, testing, increment-version ]
+    needs: [ create-branch, increment-version ]
     runs-on: ubuntu-latest
     env:
       GPR_USER: ${{ github.actor }}
