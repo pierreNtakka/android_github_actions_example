@@ -148,7 +148,7 @@ jobs:
 
 
   create-tag:
-    needs: [ create-branch, testing, increment-version, upload-sdk ]
+    needs: [ create-branch, increment-version, upload-sdk ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch
@@ -205,7 +205,7 @@ jobs:
 
   clean:
     runs-on: ubuntu-latest
-    needs: [ create-branch, testing, increment-version, upload-sdk, create-tag ]
+    needs: [ create-branch, increment-version, upload-sdk, create-tag ]
     if: always()
     steps:
       - name: Checkout Project
