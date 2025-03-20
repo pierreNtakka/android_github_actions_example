@@ -16,7 +16,6 @@ on:
         description: Printa dei valori che aiutano il debug
         default: false
 
-
 jobs:
   create-branch:
     runs-on: ubuntu-latest
