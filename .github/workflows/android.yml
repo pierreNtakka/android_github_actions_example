@@ -120,12 +120,12 @@ jobs:
           APP_DEMO_VERSION_CODE=$(grep -E "^APP_DEMO_VERSION_CODE=" "$gradleProperties" | cut -d'=' -f2)
           BUILD_MAVEN_SDK_VERSION=$(grep -E "^BUILD_MAVEN_SDK_VERSION=" "$gradleProperties" | cut -d'=' -f2)
       
-          if [ "$IS_FIRST_RELEASE" == "true" ]; then
+          if [ "$IS_FIRST_RELEASE" == "false" ]; then
             NEW_APP_DEMO_VERSION_CODE=$((APP_DEMO_VERSION_CODE + 1))
             sed -i "s/^APP_DEMO_VERSION_CODE=.*/APP_DEMO_VERSION_CODE=$NEW_APP_DEMO_VERSION_CODE/" "$gradleProperties"
           fi
       
-          if [ "$IS_FIRST_MAVEN_RELEASE" == "true" ]; then
+          if [ "$IS_FIRST_MAVEN_RELEASE" == "false" ]; then
             PREFIX=$(echo "$BUILD_MAVEN_SDK_VERSION" | rev | cut -d'.' -f2- | rev) 
             LAST_NUMBER=$(echo "$BUILD_MAVEN_SDK_VERSION" | rev | cut -d'.' -f1 | rev) 
             NEW_LAST_NUMBER=$((LAST_NUMBER + 1))
