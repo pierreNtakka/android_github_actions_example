@@ -1,4 +1,4 @@
-name: CI Test Step
+name: Android SDK CI V2
 
 on:
   workflow_dispatch:
@@ -7,45 +7,44 @@ on:
         type: boolean
         description: Printa dei valori che aiutano il debug
         default: false
-      mavenSdk:
+      uploadWorkFlavourPkgRegistry:
         type: boolean
-        description: Effettua il rilascio del SDK (tutti gli env) sul Gitlab Package Registry
+        description: Effettua il caricamento del SDK Work sul PKG Registry
+        default: false
+      uploadPreProdFlavourPkgRegistry:
+        type: boolean
+        description: Effettua il caricamento del SDK Work sul PKG Registry
         default: false
 
 jobs:
-
-  jobs:
-    create-branch:
-      runs-on: ubuntu-latest
-
-      steps:
-        - name: Checkout repository
-          uses: actions/checkout@v4
-
-        - name: Set up Git
-          run: |
-            git config --global user.name "github-actions[bot]"
-            git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-        - name: Create and push new branch
-          run: |
-            NEW_BRANCH="creating-release-$(date +%Y%m%d-%H%M%S)" # Nome con timestamp
-            git checkout -b "$NEW_BRANCH"
-            git push origin "$NEW_BRANCH"
-            echo "New branch $NEW_BRANCH created and pushed"
-  
-  
-
-  deliverable:
+  create-branch:
     runs-on: ubuntu-latest
-    env:
-      GPR_USER: ${{ github.actor }}
-      GPR_API_KEY: ${{ secrets.MAVEN_UPLOAD_TOKEN }}
-
+    outputs:
+      working_branch: ${{ steps.create_branch.outputs.branch_name }}
     steps:
-      - name: Checkout Project
+      - name: Checkout repository
+        id: checkout_repository
         uses: actions/checkout@v4
 
+      - name: Set up Git
+        id: set_up_git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create and push new branch
+        id: create_branch
+        run: |
+          NEW_BRANCH="creating-release-$(date +%Y%m%d-%H%M%S)"
+          git checkout -b "$NEW_BRANCH"
+          git push origin "$NEW_BRANCH"
+          echo "branch_name=$NEW_BRANCH" >> GITHUB_OUTPUT
+          echo "New branch $NEW_BRANCH created and pushed"
+
+  testing:
+    needs: create-branch
+    runs-on: ubuntu-latest
+    steps:
       - name: Set up JDK 20
         uses: actions/setup-java@v4
         with:
@@ -56,32 +55,76 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Create service credentials file using Python
-        run: |
-          mkdir -p config
-          python -c "import os; open('config/firebase-app-distr-key.json', 'w').write(os.getenv('APP_DISTR_FILE_CONTENT_KEY'))"
-          echo "GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY=$PWD/config/firebase-app-distr-key.json" >> $GITHUB_ENV
-        env:
-          APP_DISTR_FILE_CONTENT_KEY: ${{ secrets.APP_DISTR_FILE_CONTENT_KEY }}
-
-      - name: Test Gradle env variable used
-        run: ./gradlew retrieveEnvVariables
+      - name: Print Java & Gradle version
         if: ${{ github.event.inputs.debug == 'true' }}
-
-      - name: Assemble devDebug
-        run: ./gradlew uploadToAppDistributionUatDebug
-
-      - name: Clean up JSON file and environment variable
-        if: always()
         run: |
-          # Remove the file if it exists
-          if [ -f "$GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY" ]; then
-            rm $GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY
-            echo "JSON file removed."
-          else
-            echo "No JSON file found."
-          fi
+          java --version
+          ./gradlew --version
+
+      - name: Execute testing
+        run: |
+          ./gradlew :app:testing
+
+  increment-version:
+    needs: [ create-branch, testing ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up JDK 20
+        uses: actions/setup-java@v4
+        with:
+          java-version: '20'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Print Java & Gradle version
+        if: ${{ github.event.inputs.debug == 'true' }}
+        run: |
+          java --version
+          ./gradlew --version
+
+      - name: Checkout branch "testing"
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.create-branch.outputs.branch_name }}
+
+      - name: Disable local implementation
+        run: |
+          sed -i "s|^ENABLE_LOCAL_IMPLEMENTATION=.*|ENABLE_LOCAL_IMPLEMENTATION=false|" "gradle.properties"
+
+      - name: Check current ENABLE_LOCAL_IMPLEMENTATION variable
+        if: ${{ github.event.inputs.debug == 'true'}}
+        run: |
+          ./gradlew properties | grep ENABLE_LOCAL_IMPLEMENTATION
+
+      - name: Print Version properties PRE incremented
+        if: ${{ github.event.inputs.debug == 'true'}}
+        run: |
+          ./gradlew properties | grep APP_DEMO_VERSION_CODE
+          ./gradlew properties | grep RELEASE_VERSION_NAME
+          ./gradlew properties | grep BUILD_MAVEN_SDK_VERSION
+
+      - name: Increment Maven Version
+        run: |
+          ./gradlew :myTestLibrary:incrementMavenVersion
+          ./gradlew :app:incrementVersion
+
+      - name: Print Version properties PRE incremented
+        if: ${{ github.event.inputs.debug == 'true'}}
+        run: |
+          ./gradlew properties | grep APP_DEMO_VERSION_CODE
+          ./gradlew properties | grep RELEASE_VERSION_NAME
+          ./gradlew properties | grep BUILD_MAVEN_SDK_VERSION
+
+      - name: Commit And Push the incremented Version
+        run: |
           
-          # Remove the environment variable
-          echo "Removing the GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY environment variable."
-          unset GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY
+          APP_VERSION_CODE=$(./gradlew properties | grep "APP_VERSION_CODE" | sed 's/.*: //')
+          BUILD_MAVEN_SDK_VERSION=$(./gradlew properties | grep "BUILD_MAVEN_SDK_VERSION" | sed 's/.*: //')
+          RELEASE_VERSION_NAME=$(./gradlew properties | grep "RELEASE_VERSION_NAME" | sed 's/.*: //')
+          
+          git add .
+          git commit -m "chore: Update app versionCode to: $APP_VERSION_CODE and versionName: $RELEASE_VERSION_NAME and maven version $RELEASE_VERSION_NAME"
+          git push
