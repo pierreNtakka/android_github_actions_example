@@ -6,7 +6,16 @@ on:
       debug:
         type: boolean
         description: Printa dei valori che aiutano il debug
-        default: true
+        default: false
+      incrementVersion:
+        type: boolean
+        description: Printa dei valori che aiutano il debug
+        default: false
+      uploadWorkFlavour:
+        type: boolean
+        description: Printa dei valori che aiutano il debug
+        default: false
+
 
 jobs:
   create-branch:
@@ -68,6 +77,7 @@ jobs:
   increment-version:
     needs: [ create-branch, testing ]
     runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.incrementVersion == 'true' }}
     steps:
       - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}"
         uses: actions/checkout@v4
@@ -79,22 +89,6 @@ jobs:
         run: |
           echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
 
-      - name: Set up JDK 20
-        uses: actions/setup-java@v4
-        with:
-          java-version: '20'
-          distribution: 'temurin'
-          cache: gradle
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Print Java & Gradle version
-        if: ${{ github.event.inputs.debug == 'true' }}
-        run: |
-          java --version
-          ./gradlew --version
-
       - name: Disable local implementation
         run: |
           sed -i "s|^ENABLE_LOCAL_IMPLEMENTATION=.*|ENABLE_LOCAL_IMPLEMENTATION=false|" "gradle.properties"
@@ -102,14 +96,17 @@ jobs:
       - name: Check current ENABLE_LOCAL_IMPLEMENTATION variable
         if: ${{ github.event.inputs.debug == 'true'}}
         run: |
-          ./gradlew properties | grep ENABLE_LOCAL_IMPLEMENTATION
+          gradlePropertyFileName = "gradle.properties"
+          enableLocalImpl=$(grep -E "^[^#]*ENABLE_LOCAL_IMPLEMENTATION=" $gradlePropertyFileName | cut -d'=' -f2-)
+          echo "${enableLocalImpl}"
 
       - name: Print Version properties PRE incremented
         if: ${{ github.event.inputs.debug == 'true'}}
         run: |
-          ./gradlew properties | grep APP_DEMO_VERSION_CODE
-          ./gradlew properties | grep RELEASE_VERSION_NAME
-          ./gradlew properties | grep BUILD_MAVEN_SDK_VERSION
+          gradlePropertyFileName = "gradle.properties"
+          echo "$(grep -E "^[^#]*APP_DEMO_VERSION_CODE=" $gradlePropertyFileName | cut -d'=' -f2-)"
+          echo "$(grep -E "^[^#]*RELEASE_VERSION_NAME=" $gradlePropertyFileName | cut -d'=' -f2-)"
+          echo "$(grep -E "^[^#]*BUILD_MAVEN_SDK_VERSION=" $gradlePropertyFileName | cut -d'=' -f2-)"
 
       - name: Increment App and SDK Version
         run: |
