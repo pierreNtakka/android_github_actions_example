@@ -136,7 +136,7 @@ jobs:
           RELEASE_VERSION_NAME=$(./gradlew properties | grep "RELEASE_VERSION_NAME" | sed 's/.*: //')
           
           git add .
-          git commit -m "chore: Update app versionCode to: $APP_VERSION_CODE and versionName: $RELEASE_VERSION_NAME and maven version BUILD_MAVEN_SDK_VERSION"
+          git commit -m "chore: Update app versionCode to: $APP_VERSION_CODE and versionName: $RELEASE_VERSION_NAME and maven version $BUILD_MAVEN_SDK_VERSION"
           git push
 
   upload-app-demo:
