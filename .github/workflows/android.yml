@@ -6,15 +6,11 @@ on:
       debug:
         type: boolean
         description: Printa dei valori che aiutano il debug
-        default: true
+        default: false
       incrementVersion:
         type: boolean
         description: Printa dei valori che aiutano il debug
-        default: false
-      uploadWorkFlavour:
-        type: boolean
-        description: Printa dei valori che aiutano il debug
-        default: false
+        default: true
 
 
 jobs:
