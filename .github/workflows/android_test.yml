@@ -61,6 +61,11 @@ jobs:
           java --version
           ./gradlew --version
 
+      - name: Checkout branch "testing"
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.create-branch.outputs.working_branch }}
+
       - name: Execute testing
         run: |
           ./gradlew :app:testing
@@ -88,7 +93,7 @@ jobs:
       - name: Checkout branch "testing"
         uses: actions/checkout@v4
         with:
-          ref: ${{ needs.create-branch.outputs.branch_name }}
+          ref: ${{ needs.create-branch.outputs.working_branch }}
 
       - name: Disable local implementation
         run: |
