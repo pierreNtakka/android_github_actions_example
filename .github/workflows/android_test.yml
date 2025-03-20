@@ -162,4 +162,4 @@ jobs:
 
       - name: Commit And Push the incremented Version
         run: |
-          git push origin –d ${{ needs.create-branch.outputs.working_branch }}
+          git push origin –d ${{ needs.create-branch.outputs.branch_name }}
