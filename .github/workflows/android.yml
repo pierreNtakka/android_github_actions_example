@@ -1,4 +1,4 @@
-name: Upload library ino PKG Registry and Firebase App Distribution
+name: Lib into PKG Registry and App into Firebase App Distr
 
 on:
   workflow_dispatch:
