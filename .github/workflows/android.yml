@@ -6,7 +6,7 @@ on:
       debug:
         type: boolean
         description: Printa dei valori che aiutano il debug
-        default: false
+        default: true
       incrementVersion:
         type: boolean
         description: Printa dei valori che aiutano il debug
