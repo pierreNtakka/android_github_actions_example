@@ -63,6 +63,20 @@ android {
             dimension = "example"
         }
     }
+
+
+    libraryVariants.all {
+        this.outputs
+            .map { it as com.android.build.gradle.internal.api.LibraryVariantOutputImpl }
+            .forEach { output ->
+                val variant = this.buildType.name
+                var aarfileName = "myTestLibrary-$variant"
+                aarfileName += ".aar"
+                println("aarFilenName=$aarfileName}")
+                output.outputFileName = aarfileName
+            }
+    }
+
 }
 
 dependencies {
