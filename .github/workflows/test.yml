@@ -1,8 +1,12 @@
-name: Test delete snippets
+name: Clean GitHub from  a specific Version
 
 on:
   workflow_dispatch:
     inputs:
+      versionToDelete:
+        type: string
+        description: Specificare la versione da cancellare
+        required: true
       debug:
         type: boolean
         description: Printa dei valori che aiutano il debug
@@ -10,8 +14,6 @@ on:
 
 env:
   PACKAGE_NAME: "com.pditta.githubactions.mytestlibrary"
-  VERSION_PREFIX: "25.03.0.16"
-  TAG_NAME: "25.03.0.16"
 
 jobs:
   clean-package-registry:
@@ -23,7 +25,7 @@ jobs:
       - name: Delete ${{ env.VERSION_TO_DELETE }}
         id: delete_pkg_registry
         env:
-          VERSION_TO_DELETE: ${{ env.VERSION_PREFIX }}-${{ matrix.flavour }}
+          VERSION_TO_DELETE: ${{ inputs.versionToDelete }}-${{ matrix.flavour }}
         shell: bash
         run: |
           # Ottieni tutte le versioni del pacchetto
@@ -56,21 +58,13 @@ jobs:
             echo "La versione $VERSION_TO_DELETE non esiste, niente da cancellare."
           fi
 
-  remove-tag-and-release:
+  remove-release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout branch
-        uses: actions/checkout@v4
-
-      - name: Set up Git
-        uses: ./.github/actions/setup-git
-
       - name: Delete GitHub Release
         run: |
           release_id=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ env.TAG_NAME }}" | jq -r '.id')
-
-          echo "$release_id"
+            "https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ inputs.versionToDelete }}" | jq -r '.id')
 
           if [ "$release_id" != "null" ]; then
             delete_response=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE \
@@ -78,14 +72,38 @@ jobs:
               "https://api.github.com/repos/${{ github.repository }}/releases/$release_id")
 
             if [ "$delete_response" -eq 204 ]; then
-              echo "La release associata al tag ${{ env.TAG_NAME }} è stata cancellata con successo."
+              echo "La release associata al tag ${{ inputs.versionToDelete }} è stata cancellata con successo."
             elif [ "$delete_response" -eq 404 ]; then
-              echo "Errore: La release associata al tag ${{ env.TAG_NAME }} non è stata trovata per la cancellazione."
+              echo "Errore: La release associata al tag ${{ inputs.versionToDelete }} non è stata trovata per la cancellazione."
               exit 1
             else
               echo "Errore nella cancellazione della release. Codice di stato: $delete_response"
               exit 1
             fi
           else
-            echo "Nessuna release associata al tag ${{ env.TAG_NAME }} trovata."
+            echo "Nessuna release associata al tag ${{ inputs.versionToDelete }} trovata."
           fi
+
+  remove-tag:
+    runs-on: ubuntu-latest
+    needs: remove-release
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Set up Git
+        uses: ./.github/actions/setup-git
+
+      - name: Check if Tag Exists
+        id: check_tag
+        run: |
+          if git ls-remote --tags origin | grep -q "refs/tags/${{ inputs.versionToDelete }}"; then
+            echo "TAG_EXISTS=true" >> $GITHUB_OUTPUT
+          else
+            echo "TAG_EXISTS=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Delete Git Tag
+        if: ${{ steps.check_tag.outputs.TAG_EXISTS == 'true' }}
+        run: |
+          git push origin --delete ${{ inputs.versionToDelete }}
