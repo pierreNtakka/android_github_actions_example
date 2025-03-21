@@ -37,10 +37,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}
-        run: |
-          ls -la
-          cd .github/actions
-          ls -lrt
-
-      - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}
         uses: ./.github/actions/setup-frank

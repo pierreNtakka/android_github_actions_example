@@ -4,39 +4,6 @@ def firebaseAppDistributionPrefixTaskName = "appDistributionUpload"
 def flavorAppDistrPrefixTaskName = "uploadToAppDistribution"
 def uploadToFirebaseTasksName = new ArrayList<String>()
 
-tasks.register('incrementVersion') {
-    doLast {
-        ant.propertyfile(file: "../gradle.properties") {
-
-            def isFirstRelease = IS_FIRST_RELEASE.toBoolean()
-
-            if (!isFirstRelease) {
-                def appDemoVersionCode = APP_DEMO_VERSION_CODE.toInteger()
-                appDemoVersionCode = appDemoVersionCode + 1
-                APP_DEMO_VERSION_CODE = appDemoVersionCode
-                entry(key: "APP_DEMO_VERSION_CODE", value: APP_DEMO_VERSION_CODE.toString())
-            }
-
-        }
-    }
-}
-
-tasks.register('incrementVersionNextRelease') {
-    description "Increment versionName and versionCode of App and SDK"
-    doLast {
-        ant.propertyfile(file: "../gradle.properties") {
-
-            def appDemoVersionCode = APP_DEMO_VERSION_CODE.toInteger()
-
-            if (appDemoVersionCode == 1) {
-                def isFirstRelease = IS_FIRST_RELEASE.toBoolean()
-                isFirstRelease = false
-                IS_FIRST_RELEASE = isFirstRelease
-                entry(key: "IS_FIRST_RELEASE", value: IS_FIRST_RELEASE.toString())
-            }
-        }
-    }
-}
 
 android.applicationVariants.configureEach { variant ->
     def variantName = "${variant.name.capitalize()}"

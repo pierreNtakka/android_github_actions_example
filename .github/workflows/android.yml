@@ -89,16 +89,14 @@ jobs:
 
       - name: Increment App and SDK Version
         run: |
-          gradleProperties="gradle.properties"
-          
-          IS_FIRST_RELEASE=$(grep -E "^IS_FIRST_RELEASE=" "$gradleProperties" | cut -d'=' -f2)
-          IS_FIRST_MAVEN_RELEASE=$(grep -E "^IS_FIRST_MAVEN_RELEASE=" "$gradleProperties" | cut -d'=' -f2)
-          APP_DEMO_VERSION_CODE=$(grep -E "^APP_DEMO_VERSION_CODE=" "$gradleProperties" | cut -d'=' -f2)
-          BUILD_MAVEN_SDK_VERSION=$(grep -E "^BUILD_MAVEN_SDK_VERSION=" "$gradleProperties" | cut -d'=' -f2)
+          IS_FIRST_RELEASE=$(grep -E "^IS_FIRST_RELEASE=" "$GRADLE_PROPERTIES_FILENAME" | cut -d'=' -f2)
+          IS_FIRST_MAVEN_RELEASE=$(grep -E "^IS_FIRST_MAVEN_RELEASE=" "$GRADLE_PROPERTIES_FILENAME" | cut -d'=' -f2)
+          APP_DEMO_VERSION_CODE=$(grep -E "^APP_DEMO_VERSION_CODE=" "$GRADLE_PROPERTIES_FILENAME" | cut -d'=' -f2)
+          BUILD_MAVEN_SDK_VERSION=$(grep -E "^BUILD_MAVEN_SDK_VERSION=" "$GRADLE_PROPERTIES_FILENAME" | cut -d'=' -f2)
           
           if [ "$IS_FIRST_RELEASE" == "false" ]; then
             NEW_APP_DEMO_VERSION_CODE=$((APP_DEMO_VERSION_CODE + 1))
-            sed -i "s/^APP_DEMO_VERSION_CODE=.*/APP_DEMO_VERSION_CODE=$NEW_APP_DEMO_VERSION_CODE/" "$gradleProperties"
+            sed -i "s/^APP_DEMO_VERSION_CODE=.*/APP_DEMO_VERSION_CODE=$NEW_APP_DEMO_VERSION_CODE/" "$GRADLE_PROPERTIES_FILENAME"
           fi
           
           if [ "$IS_FIRST_MAVEN_RELEASE" == "false" ]; then
@@ -106,7 +104,7 @@ jobs:
             LAST_NUMBER=$(echo "$BUILD_MAVEN_SDK_VERSION" | rev | cut -d'.' -f1 | rev) 
             NEW_LAST_NUMBER=$((LAST_NUMBER + 1))
             NEW_BUILD_MAVEN_SDK_VERSION="$PREFIX.$NEW_LAST_NUMBER"
-            sed -i "s/^BUILD_MAVEN_SDK_VERSION=.*/BUILD_MAVEN_SDK_VERSION=$NEW_BUILD_MAVEN_SDK_VERSION/" "$gradleProperties"
+            sed -i "s/^BUILD_MAVEN_SDK_VERSION=.*/BUILD_MAVEN_SDK_VERSION=$NEW_BUILD_MAVEN_SDK_VERSION/" "$GRADLE_PROPERTIES_FILENAME"
           fi
 
       - name: Print Version properties POST incremented
@@ -209,7 +207,7 @@ jobs:
       - name: Upload SDK ${{ matrix.flavour }}
         run: ./gradlew uploadToGitHubPkg${{ matrix.flavour }}
 
-  create-tag:
+  create-release:
     needs: [ create-branch, increment-version,testing, upload-sdk, upload-app-demo ]
     runs-on: ubuntu-latest
     steps:
@@ -224,9 +222,9 @@ jobs:
           git fetch origin ${{ needs.create-branch.outputs.branch_name }}
           git merge origin/${{ needs.create-branch.outputs.branch_name }}
           
-          sed -i "s|^ENABLE_LOCAL_IMPLEMENTATION=.*|ENABLE_LOCAL_IMPLEMENTATION=true|" "gradle.properties"
-          sed -i "s|^IS_FIRST_RELEASE=.*|IS_FIRST_RELEASE=false|" "gradle.properties"
-          sed -i "s|^IS_FIRST_RELEASE=.*|IS_FIRST_RELEASE=false|" "gradle.properties"
+          sed -i "s|^ENABLE_LOCAL_IMPLEMENTATION=.*|ENABLE_LOCAL_IMPLEMENTATION=true|" "$GRADLE_PROPERTIES_FILENAME"
+          sed -i "s|^IS_FIRST_RELEASE=.*|IS_FIRST_RELEASE=false|" "$GRADLE_PROPERTIES_FILENAME"
+          sed -i "s|^IS_FIRST_RELEASE=.*|IS_FIRST_RELEASE=false|" "$GRADLE_PROPERTIES_FILENAME"
 
           git add .
           git commit -m "chore: enable local implementation"
