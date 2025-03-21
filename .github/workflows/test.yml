@@ -17,4 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Test composite
+        run: |
+          ls
+          pwd
+      - name: Test composite
         uses: ./../actions/print-gradle-properties/action.yml
