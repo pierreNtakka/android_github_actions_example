@@ -8,6 +8,9 @@ on:
         description: Printa dei valori che aiutano il debug
         default: true
 
+env:
+  GRADLE_PROPERTIES_FILENAME: "gradle.properties"
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -22,3 +25,5 @@ jobs:
       - name: Test composite
         if: ${{ github.event.inputs.debug == 'true'}}
         uses: ./.github/actions/print-gradle-properties
+        with:
+          gradleFileName: ${{ env.GRADLE_PROPERTIES_FILENAME }}
