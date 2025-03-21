@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}
-        uses: ./.github/actions/setup-branch
+        uses: ./.github/actions/setup-frank
         with:
           branchName: ${{ needs.create-branch.outputs.branch_name }}
           debug: ${{ github.event.inputs.debug }}
