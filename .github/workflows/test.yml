@@ -18,4 +18,4 @@ jobs:
           pwd
       - name: Test composite
         if: ${{ github.event.inputs.debug == 'true'}}
-        uses: ./action.yml
+        uses: ./github/workflows/action.yml
