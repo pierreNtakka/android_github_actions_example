@@ -21,4 +21,4 @@ jobs:
 
       - name: Test composite
         if: ${{ github.event.inputs.debug == 'true'}}
-        uses: ./.github/actions/print-gradle-properties/
+        uses: ./.github/actions/print-gradle-properties/action.yml
