@@ -1,0 +1,26 @@
+name: 'Checkout Branch'
+description: 'Checkout the specific branch name'
+
+inputs:
+  branchName:
+    description: "The git branch name"
+    required: true
+  debug:
+    description: "THe debug option is enabled"
+    required: true
+    default: 'false'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Checkout branch ${{ inputs.branchName }}"
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ inputs.branchName }}
+
+    - name: Print working branch value
+      if: ${{ inputs.debug == 'true' }}
+      shell: bash
+      run: |
+        branchName = ${{ inputs.branchName }}
+        echo "Working branch is: $branchName"

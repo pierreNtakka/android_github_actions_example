@@ -5,9 +5,11 @@ inputs:
   gradleFileName:
     description: "The gradle file name"
     required: true
+    default: 'gradle.properties'
   debug:
     description: "THe debug option is enabled"
     required: true
+    default: 'false'
 
 runs:
   using: 'composite'

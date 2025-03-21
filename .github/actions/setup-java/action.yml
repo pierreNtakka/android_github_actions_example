@@ -10,6 +10,10 @@ inputs:
     description: 'Java distribution to use'
     required: true
     default: 'temurin'
+  debug:
+    description: "THe debug option is enabled"
+    required: true
+    default: 'false'
 
 runs:
   using: 'composite'
@@ -25,9 +29,12 @@ runs:
       shell: bash
       run: chmod +x gradlew
 
-    - name: Print Java & Gradle version (debug only)
-      if: ${{ github.event.inputs.debug == 'true' }}
+    - name: Print Java (debug only)
+      if: ${{ inputs.debug == 'true'}}
       shell: bash
-      run: |
-        java --version
-        ./gradlew --version
+      run: java --version
+
+    - name: Print Gradle version (debug only)
+      if: ${{ inputs.debug == 'true'}}
+      shell: bash
+      run: ./gradlew --version

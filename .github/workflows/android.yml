@@ -13,6 +13,8 @@ on:
         default: true
 env:
   GRADLE_PROPERTIES_FILENAME: "gradle.properties"
+  JAVA_VERSION: "20"
+  JAVA_DISTRIBUTION: "temurin"
 
 jobs:
   create-branch:
@@ -40,30 +42,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}"
-        uses: actions/checkout@v4
+        uses: ./.github/actions/checkout-branch
         with:
-          ref: ${{ needs.create-branch.outputs.branch_name }}
-
-      - name: Print working branch value
-        if: ${{ github.event.inputs.debug == 'true' }}
-        run: |
-          echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
+          branchName: ${{ needs.create-branch.outputs.branch_name }}
+          debug: ${{ github.event.inputs.debug}}
 
       - name: Set up JDK 20
-        uses: actions/setup-java@v4
+        uses: ./.github/actions/setup-java
         with:
-          java-version: '20'
-          distribution: 'temurin'
-          cache: gradle
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Print Java & Gradle version
-        if: ${{ github.event.inputs.debug == 'true' }}
-        run: |
-          java --version
-          ./gradlew --version
+          java-version: ${{ env.JAVA_VERSION }
+          distribution: ${{ env.JAVA_DISTRIBUTION }
+          debug: ${{ github.event.inputs.debug }}
 
       - name: Execute testing
         run: |
@@ -75,22 +64,20 @@ jobs:
     if: ${{ github.event.inputs.incrementVersion == 'true' }}
     steps:
       - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}"
-        uses: actions/checkout@v4
+        uses: ./.github/actions/checkout-branch
         with:
-          ref: ${{ needs.create-branch.outputs.branch_name }}
-
-      - name: Print working branch value
-        if: ${{ github.event.inputs.debug == 'true' }}
-        run: |
-          echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
+          branchName: ${{ needs.create-branch.outputs.branch_name }}
+          debug: ${{ github.event.inputs.debug}}
 
       - name: Disable local implementation
         run: |
           sed -i "s|^ENABLE_LOCAL_IMPLEMENTATION=.*|ENABLE_LOCAL_IMPLEMENTATION=false|" "$GRADLE_PROPERTIES_FILENAME"
 
       - name: Print Version properties PRE incremented
-        if: ${{ github.event.inputs.debug == 'true'}}
         uses: ./.github/actions/print-gradle-properties
+        with:
+          gradleFileName: ${{ env.GRADLE_PROPERTIES_FILENAME }}
+          debug: ${{ github.event.inputs.debug}}
 
       - name: Increment App and SDK Version
         run: |
@@ -115,8 +102,10 @@ jobs:
           fi
 
       - name: Print Version properties POST incremented
-        if: ${{ github.event.inputs.debug == 'true'}}
         uses: ./.github/actions/print-gradle-properties
+        with:
+          debug: ${{ github.event.inputs.debug}}
+          gradleFileName: ${{ env.GRADLE_PROPERTIES_FILENAME }}
 
       - name: Set up Git
         uses: ./.github/actions/setup-git
@@ -139,30 +128,17 @@ jobs:
         flavour: [ DevDebug, UatDebug, PreProdDebug, ProdDebug ]
     steps:
       - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}"
-        uses: actions/checkout@v4
+        uses: ./.github/actions/checkout-branch
         with:
-          ref: ${{ needs.create-branch.outputs.branch_name }}
-
-      - name: Print working branch value
-        if: ${{ github.event.inputs.debug == 'true' }}
-        run: |
-          echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
+          branchName: ${{ needs.create-branch.outputs.branch_name }}
+          debug: ${{ github.event.inputs.debug}}
 
       - name: Set up JDK 20
-        uses: actions/setup-java@v4
+        uses: ./.github/actions/setup-java
         with:
-          java-version: '20'
-          distribution: 'temurin'
-          cache: gradle
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Print Java & Gradle version
-        if: ${{ github.event.inputs.debug == 'true' }}
-        run: |
-          java --version
-          ./gradlew --version
+          java-version: ${{ env.JAVA_VERSION }
+          distribution: ${{ env.JAVA_DISTRIBUTION }
+          debug: ${{ github.event.inputs.debug }}
 
       - name: Create Firebase App Keys
         env:
@@ -202,30 +178,17 @@ jobs:
         flavour: [ DevRelease, UatRelease, PreProdRelease, ProdRelease ]
     steps:
       - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}"
-        uses: actions/checkout@v4
+        uses: ./.github/actions/checkout-branch
         with:
-          ref: ${{ needs.create-branch.outputs.branch_name }}
-
-      - name: Print working branch value
-        if: ${{ github.event.inputs.debug == 'true' }}
-        run: |
-          echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
+          branchName: ${{ needs.create-branch.outputs.branch_name }}
+          debug: ${{ github.event.inputs.debug}}
 
       - name: Set up JDK 20
-        uses: actions/setup-java@v4
+        uses: ./.github/actions/setup-java
         with:
-          java-version: '20'
-          distribution: 'temurin'
-          cache: gradle
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Print Java & Gradle version
-        if: ${{ github.event.inputs.debug == 'true' }}
-        run: |
-          java --version
-          ./gradlew --version
+          java-version: ${{ env.JAVA_VERSION }
+          distribution: ${{ env.JAVA_DISTRIBUTION }
+          debug: ${{ github.event.inputs.debug }}
 
       - name: Upload SDK ${{ matrix.flavour }}
         run: ./gradlew uploadToGitHubPkg${{ matrix.flavour }}
