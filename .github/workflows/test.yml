@@ -11,7 +11,7 @@ on:
 env:
   PACKAGE_NAME: "com.pditta.githubactions.mytestlibrary"
   VERSION_PREFIX: "25.03.0.16"
-  TAG_NAME: ${{ env.VERSION_PREFIX }}
+  TAG_NAME: "25.03.0.16"
 
 jobs:
   clean-package-registry:
