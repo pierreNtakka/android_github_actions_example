@@ -41,8 +41,8 @@ jobs:
     needs: create-branch
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}"
-        uses: ./.github/actions/checkout-branch
+      - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}
+        uses: ./.github/actions/setup-branch
         with:
           branchName: ${{ needs.create-branch.outputs.branch_name }}
           debug: ${{ github.event.inputs.debug}}
@@ -63,8 +63,8 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.incrementVersion == 'true' }}
     steps:
-      - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}"
-        uses: ./.github/actions/checkout-branch
+      - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}
+        uses: ./.github/actions/setup-branch
         with:
           branchName: ${{ needs.create-branch.outputs.branch_name }}
           debug: ${{ github.event.inputs.debug}}
@@ -128,7 +128,7 @@ jobs:
         flavour: [ DevDebug, UatDebug, PreProdDebug, ProdDebug ]
     steps:
       - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}"
-        uses: ./.github/actions/checkout-branch
+        uses: ./.github/actions/setup-branch
         with:
           branchName: ${{ needs.create-branch.outputs.branch_name }}
           debug: ${{ github.event.inputs.debug}}
@@ -178,7 +178,7 @@ jobs:
         flavour: [ DevRelease, UatRelease, PreProdRelease, ProdRelease ]
     steps:
       - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}"
-        uses: ./.github/actions/checkout-branch
+        uses: ./.github/actions/setup-branch
         with:
           branchName: ${{ needs.create-branch.outputs.branch_name }}
           debug: ${{ github.event.inputs.debug}}
