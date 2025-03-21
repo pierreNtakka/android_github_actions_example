@@ -9,7 +9,7 @@ on:
         default: false
       incrementVersion:
         type: boolean
-        description: Printa dei valori che aiutano il debug
+        description: Incrementa la version
         default: true
 env:
   GRADLE_PROPERTIES_FILENAME: "gradle.properties"
@@ -50,8 +50,8 @@ jobs:
       - name: Set up JDK 20
         uses: ./.github/actions/setup-java
         with:
-          java-version: ${{ env.JAVA_VERSION }
-          distribution: ${{ env.JAVA_DISTRIBUTION }
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
           debug: ${{ github.event.inputs.debug }}
 
       - name: Execute testing
@@ -136,8 +136,8 @@ jobs:
       - name: Set up JDK 20
         uses: ./.github/actions/setup-java
         with:
-          java-version: ${{ env.JAVA_VERSION }
-          distribution: ${{ env.JAVA_DISTRIBUTION }
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
           debug: ${{ github.event.inputs.debug }}
 
       - name: Create Firebase App Keys
@@ -186,8 +186,8 @@ jobs:
       - name: Set up JDK 20
         uses: ./.github/actions/setup-java
         with:
-          java-version: ${{ env.JAVA_VERSION }
-          distribution: ${{ env.JAVA_DISTRIBUTION }
+          java-version: ${{ env.JAVA_VERSION  }}
+          distribution: ${{ env.JAVA_DISTRIBUTION  }}
           debug: ${{ github.event.inputs.debug }}
 
       - name: Upload SDK ${{ matrix.flavour }}
