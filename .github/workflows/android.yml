@@ -256,7 +256,7 @@ jobs:
 
   clean:
     runs-on: ubuntu-latest
-    needs: [ create-branch, increment-version,testing, upload-sdk, upload-app-demo, create-tag ]
+    needs: [ create-branch, increment-version,testing, upload-sdk, upload-app-demo, create-release ]
     if: always()
     steps:
       - name: Checkout Project
