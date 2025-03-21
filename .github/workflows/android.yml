@@ -9,9 +9,12 @@ on:
         default: false
       incrementVersion:
         type: boolean
-        description: Printa dei valori che aiutano il debug
+        description: Incrementa la version
         default: true
-
+env:
+  GRADLE_PROPERTIES_FILENAME: "gradle.properties"
+  JAVA_VERSION: "20"
+  JAVA_DISTRIBUTION: "temurin"
 
 jobs:
   create-branch:
@@ -23,9 +26,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Git
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        uses: ./.github/actions/setup-git
 
       - name: Create and push new branch
         id: create_branch
@@ -40,7 +41,7 @@ jobs:
     needs: create-branch
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}"
+      - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}
         uses: actions/checkout@v4
         with:
           ref: ${{ needs.create-branch.outputs.branch_name }}
@@ -49,22 +50,13 @@ jobs:
         if: ${{ github.event.inputs.debug == 'true' }}
         run: |
           echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
-
+          
       - name: Set up JDK 20
-        uses: actions/setup-java@v4
+        uses: ./.github/actions/setup-java
         with:
-          java-version: '20'
-          distribution: 'temurin'
-          cache: gradle
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Print Java & Gradle version
-        if: ${{ github.event.inputs.debug == 'true' }}
-        run: |
-          java --version
-          ./gradlew --version
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          debug: ${{ github.event.inputs.debug }}
 
       - name: Execute testing
         run: |
@@ -75,7 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.event.inputs.incrementVersion == 'true' }}
     steps:
-      - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}"
+      - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}
         uses: actions/checkout@v4
         with:
           ref: ${{ needs.create-branch.outputs.branch_name }}
@@ -87,31 +79,13 @@ jobs:
 
       - name: Disable local implementation
         run: |
-          gradlePropertyFileName="gradle.properties"
-          sed -i "s|^ENABLE_LOCAL_IMPLEMENTATION=.*|ENABLE_LOCAL_IMPLEMENTATION=false|" "$gradlePropertyFileName"
-
-      - name: Check current ENABLE_LOCAL_IMPLEMENTATION variable
-        if: ${{ github.event.inputs.debug == 'true'}}
-        run: |
-          gradlePropertyFileName="gradle.properties"
-          enableLocalImpl=$(grep -E "^[^#]*ENABLE_LOCAL_IMPLEMENTATION=" "$gradlePropertyFileName" | cut -d'=' -f2-)
-          echo "${enableLocalImpl}"
+          sed -i "s|^ENABLE_LOCAL_IMPLEMENTATION=.*|ENABLE_LOCAL_IMPLEMENTATION=false|" "$GRADLE_PROPERTIES_FILENAME"
 
       - name: Print Version properties PRE incremented
-        if: ${{ github.event.inputs.debug == 'true'}}
-        run: |
-          gradlePropertyFileName="gradle.properties"
-          
-          appDemoVersionCode=$(grep -E "^[^#]*APP_DEMO_VERSION_CODE=" "$gradlePropertyFileName" | cut -d'=' -f2-)
-          releaseVersionName=$(grep -E "^[^#]*RELEASE_VERSION_NAME=" "$gradlePropertyFileName" | cut -d'=' -f2-)
-          buildMavenSdkVersion=$(grep -E "^[^#]*BUILD_MAVEN_SDK_VERSION=" "$gradlePropertyFileName" | cut -d'=' -f2-)
-          enableLocalImpl=$(grep -E "^[^#]*ENABLE_LOCAL_IMPLEMENTATION=" "$gradlePropertyFileName" | cut -d'=' -f2-)
-          
-          echo "APP_DEMO_VERSION_CODE=$appDemoVersionCode"
-          echo "RELEASE_VERSION_NAME=$releaseVersionName"
-          echo "BUILD_MAVEN_SDK_VERSION=$buildMavenSdkVersion"
-          echo "ENABLE_LOCAL_IMPLEMENTATION=$enableLocalImpl"
-
+        uses: ./.github/actions/print-gradle-properties
+        with:
+          gradleFileName: ${{ env.GRADLE_PROPERTIES_FILENAME }}
+          debug: ${{ github.event.inputs.debug}}
 
       - name: Increment App and SDK Version
         run: |
@@ -136,29 +110,19 @@ jobs:
           fi
 
       - name: Print Version properties POST incremented
-        if: ${{ github.event.inputs.debug == 'true'}}
-        run: |
-          gradlePropertyFileName="gradle.properties"
-          appDemoVersionCode=$(grep -E "^[^#]*APP_DEMO_VERSION_CODE=" "$gradlePropertyFileName" | cut -d'=' -f2-)
-          releaseVersionName=$(grep -E "^[^#]*RELEASE_VERSION_NAME=" "$gradlePropertyFileName" | cut -d'=' -f2-)
-          buildMavenSdkVersion=$(grep -E "^[^#]*BUILD_MAVEN_SDK_VERSION=" "$gradlePropertyFileName" | cut -d'=' -f2-)
-          enableLocalImpl=$(grep -E "^[^#]*ENABLE_LOCAL_IMPLEMENTATION=" "$gradlePropertyFileName" | cut -d'=' -f2-)
-          
-          echo "APP_DEMO_VERSION_CODE=$appDemoVersionCode"
-          echo "RELEASE_VERSION_NAME=$releaseVersionName"
-          echo "BUILD_MAVEN_SDK_VERSION=$buildMavenSdkVersion"
-          echo "ENABLE_LOCAL_IMPLEMENTATION=$enableLocalImpl"
+        uses: ./.github/actions/print-gradle-properties
+        with:
+          debug: ${{ github.event.inputs.debug}}
+          gradleFileName: ${{ env.GRADLE_PROPERTIES_FILENAME }}
 
       - name: Set up Git
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        uses: ./.github/actions/setup-git
 
       - name: Commit And Push the incremented Version
         run: |
-          appDemoVersionCode=$(grep -E "^[^#]*APP_DEMO_VERSION_CODE=" "$gradlePropertyFileName" | cut -d'=' -f2-)
-          releaseVersionName=$(grep -E "^[^#]*RELEASE_VERSION_NAME=" "$gradlePropertyFileName" | cut -d'=' -f2-)
-          buildMavenSdkVersion=$(grep -E "^[^#]*BUILD_MAVEN_SDK_VERSION=" "$gradlePropertyFileName" | cut -d'=' -f2-)
+          appDemoVersionCode=$(grep -E "^[^#]*APP_DEMO_VERSION_CODE=" "$GRADLE_PROPERTIES_FILENAME" | cut -d'=' -f2-)
+          releaseVersionName=$(grep -E "^[^#]*RELEASE_VERSION_NAME=" "$GRADLE_PROPERTIES_FILENAME" | cut -d'=' -f2-)
+          buildMavenSdkVersion=$(grep -E "^[^#]*BUILD_MAVEN_SDK_VERSION=" "$GRADLE_PROPERTIES_FILENAME" | cut -d'=' -f2-)
           
           git add .
           git commit -m "chore: Update app versionCode to: $appDemoVersionCode and versionName: $releaseVersionName and maven version $buildMavenSdkVersion"
@@ -171,7 +135,7 @@ jobs:
       matrix:
         flavour: [ DevDebug, UatDebug, PreProdDebug, ProdDebug ]
     steps:
-      - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}"
+      - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}
         uses: actions/checkout@v4
         with:
           ref: ${{ needs.create-branch.outputs.branch_name }}
@@ -182,20 +146,11 @@ jobs:
           echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
 
       - name: Set up JDK 20
-        uses: actions/setup-java@v4
+        uses: ./.github/actions/setup-java
         with:
-          java-version: '20'
-          distribution: 'temurin'
-          cache: gradle
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Print Java & Gradle version
-        if: ${{ github.event.inputs.debug == 'true' }}
-        run: |
-          java --version
-          ./gradlew --version
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: ${{ env.JAVA_DISTRIBUTION }}
+          debug: ${{ github.event.inputs.debug }}
 
       - name: Create Firebase App Keys
         env:
@@ -234,7 +189,7 @@ jobs:
       matrix:
         flavour: [ DevRelease, UatRelease, PreProdRelease, ProdRelease ]
     steps:
-      - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}"
+      - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}
         uses: actions/checkout@v4
         with:
           ref: ${{ needs.create-branch.outputs.branch_name }}
@@ -245,20 +200,11 @@ jobs:
           echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
 
       - name: Set up JDK 20
-        uses: actions/setup-java@v4
+        uses: ./.github/actions/setup-java
         with:
-          java-version: '20'
-          distribution: 'temurin'
-          cache: gradle
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Print Java & Gradle version
-        if: ${{ github.event.inputs.debug == 'true' }}
-        run: |
-          java --version
-          ./gradlew --version
+          java-version: ${{ env.JAVA_VERSION  }}
+          distribution: ${{ env.JAVA_DISTRIBUTION  }}
+          debug: ${{ github.event.inputs.debug }}
 
       - name: Upload SDK ${{ matrix.flavour }}
         run: ./gradlew uploadToGitHubPkg${{ matrix.flavour }}
@@ -270,20 +216,8 @@ jobs:
       - name: Checkout branch
         uses: actions/checkout@v4
 
-      - name: Set up JDK 20
-        uses: actions/setup-java@v4
-        with:
-          java-version: '20'
-          distribution: 'temurin'
-          cache: gradle
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
       - name: Set up Git
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        uses: ./.github/actions/setup-git
 
       - name: Git merge ${{ needs.create-branch.outputs.branch_name }} into current
         run: |
@@ -301,7 +235,7 @@ jobs:
       - name: Git Tag
         id: create_git_tag
         run: |
-          GIT_TAG_NAME=$(./gradlew properties | grep "BUILD_MAVEN_SDK_VERSION" | sed 's/.*: //')
+          GIT_TAG_NAME=$(grep -E "^[^#]*BUILD_MAVEN_SDK_VERSION=" "$GRADLE_PROPERTIES_FILENAME" | cut -d'=' -f2-)
           
           echo "GIT_TAG_NAME=$GIT_TAG_NAME" >> $GITHUB_OUTPUT
           
@@ -331,9 +265,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Git
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        uses: ./.github/actions/setup-git
 
       - name: Delete branch
         run: |

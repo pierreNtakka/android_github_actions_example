@@ -1,19 +1,27 @@
 name: 'Print Gradle Properties'
 description: 'Prints key Gradle properties for debugging'
 
+inputs:
+  gradleFileName:
+    description: "The gradle file name"
+    required: true
+    default: 'gradle.properties'
+  debug:
+    description: "THe debug option is enabled"
+    required: true
+    default: 'false'
+
 runs:
   using: 'composite'
   steps:
     - name: Print Version properties
+      if: ${{ inputs.debug == 'true'}}
       shell: bash
-      if: ${{ github.event.inputs.debug == 'true'}}
       run: |
-        ls
-        gradlePropertyFileName="../../gradle.properties"
-        appDemoVersionCode=$(grep -E "^[^#]*APP_DEMO_VERSION_CODE=" "$gradlePropertyFileName" | cut -d'=' -f2-)
-        releaseVersionName=$(grep -E "^[^#]*RELEASE_VERSION_NAME=" "$gradlePropertyFileName" | cut -d'=' -f2-)
-        buildMavenSdkVersion=$(grep -E "^[^#]*BUILD_MAVEN_SDK_VERSION=" "$gradlePropertyFileName" | cut -d'=' -f2-)
-        enableLocalImpl=$(grep -E "^[^#]*ENABLE_LOCAL_IMPLEMENTATION=" "$gradlePropertyFileName" | cut -d'=' -f2-)
+        appDemoVersionCode=$(grep -E "^[^#]*APP_DEMO_VERSION_CODE=" "${{ inputs.gradleFileName }}" | cut -d'=' -f2-)
+        releaseVersionName=$(grep -E "^[^#]*RELEASE_VERSION_NAME=" "${{ inputs.gradleFileName }}" | cut -d'=' -f2-)
+        buildMavenSdkVersion=$(grep -E "^[^#]*BUILD_MAVEN_SDK_VERSION=" "${{ inputs.gradleFileName }}" | cut -d'=' -f2-)
+        enableLocalImpl=$(grep -E "^[^#]*ENABLE_LOCAL_IMPLEMENTATION=" "${{ inputs.gradleFileName }}" | cut -d'=' -f2-)
         
         echo "APP_DEMO_VERSION_CODE=$appDemoVersionCode"
         echo "RELEASE_VERSION_NAME=$releaseVersionName"

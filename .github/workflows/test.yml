@@ -6,30 +6,42 @@ on:
       debug:
         type: boolean
         description: Printa dei valori che aiutano il debug
-        default: false
-      incrementVersion:
-        type: boolean
-        description: Printa dei valori che aiutano il debug
         default: true
 
+env:
+  GRADLE_PROPERTIES_FILENAME: "gradle.properties"
+
 jobs:
-  test:
+  create-branch:
     runs-on: ubuntu-latest
+    outputs:
+      branch_name: ${{ steps.create_branch.outputs.branch_name }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Print Version properties PRE incremented
-        if: ${{ github.event.inputs.debug == 'true'}}
+      - name: Set up Git
+        uses: ./.github/actions/setup-git
+
+      - name: Create and push new branch
+        id: create_branch
         run: |
-          gradlePropertyFileName="gradle.properties"
-  
-          appDemoVersionCode=$(grep -E "^[^#]*APP_DEMO_VERSION_CODE=" "$gradlePropertyFileName" | cut -d'=' -f2-)
-          releaseVersionName=$(grep -E "^[^#]*RELEASE_VERSION_NAME=" "$gradlePropertyFileName" | cut -d'=' -f2-)
-          buildMavenSdkVersion=$(grep -E "^[^#]*BUILD_MAVEN_SDK_VERSION=" "$gradlePropertyFileName" | cut -d'=' -f2-)
-          enableLocalImpl=$(grep -E "^[^#]*ENABLE_LOCAL_IMPLEMENTATION=" "$gradlePropertyFileName" | cut -d'=' -f2-)
-  
-          echo "APP_DEMO_VERSION_CODE=$appDemoVersionCode"
-          echo "RELEASE_VERSION_NAME=$releaseVersionName"
-          echo "BUILD_MAVEN_SDK_VERSION=$buildMavenSdkVersion"
-          echo "ENABLE_LOCAL_IMPLEMENTATION=$enableLocalImpl"
+          NEW_BRANCH="creating-release-$(date +%Y%m%d-%H%M%S)"
+          git checkout -b "$NEW_BRANCH"
+          git push origin "$NEW_BRANCH"
+          echo "branch_name=$NEW_BRANCH" >> $GITHUB_OUTPUT
+          echo "New branch $NEW_BRANCH created and pushed"
+
+  testing:
+    needs: create-branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}
+        uses: ./.github/actions/setup-branch
+        with:
+          ref: ${{ needs.create-branch.outputs.branch_name }}
+          debug: ${{ github.event.inputs.debug }}
+
+          
+
+    
