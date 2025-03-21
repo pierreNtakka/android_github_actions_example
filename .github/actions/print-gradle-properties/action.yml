@@ -7,11 +7,10 @@ runs:
     - name: Print Version properties
       shell: bash
       run: |
-        gradlePropertyFileName="gradle.properties"
-        appDemoVersionCode=$(grep -E "^[^#]*APP_DEMO_VERSION_CODE=" "$gradlePropertyFileName" | cut -d'=' -f2-)
-        releaseVersionName=$(grep -E "^[^#]*RELEASE_VERSION_NAME=" "$gradlePropertyFileName" | cut -d'=' -f2-)
-        buildMavenSdkVersion=$(grep -E "^[^#]*BUILD_MAVEN_SDK_VERSION=" "$gradlePropertyFileName" | cut -d'=' -f2-)
-        enableLocalImpl=$(grep -E "^[^#]*ENABLE_LOCAL_IMPLEMENTATION=" "$gradlePropertyFileName" | cut -d'=' -f2-)
+        appDemoVersionCode=$(grep -E "^[^#]*APP_DEMO_VERSION_CODE=" "$GRADLE_PROPERTIES_FILENAME" | cut -d'=' -f2-)
+        releaseVersionName=$(grep -E "^[^#]*RELEASE_VERSION_NAME=" "$GRADLE_PROPERTIES_FILENAME" | cut -d'=' -f2-)
+        buildMavenSdkVersion=$(grep -E "^[^#]*BUILD_MAVEN_SDK_VERSION=" "$GRADLE_PROPERTIES_FILENAME" | cut -d'=' -f2-)
+        enableLocalImpl=$(grep -E "^[^#]*ENABLE_LOCAL_IMPLEMENTATION=" "$GRADLE_PROPERTIES_FILENAME" | cut -d'=' -f2-)
         
         echo "APP_DEMO_VERSION_CODE=$appDemoVersionCode"
         echo "RELEASE_VERSION_NAME=$releaseVersionName"
