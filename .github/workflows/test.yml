@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        flavour: [ dev-release, uat-release, preprod-release, prod-release ]
+        flavour: [ dev-release, uat-release, preProd-release, prod-release ]
     steps:
       - name: Delete ${{ env.VERSION_TO_DELETE }}
         id: delete_pkg_registry
