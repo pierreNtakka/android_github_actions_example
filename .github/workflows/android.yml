@@ -42,11 +42,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}
-        uses: ./.github/actions/setup-branch
+        uses: actions/checkout@v4
         with:
-          branchName: ${{ needs.create-branch.outputs.branch_name }}
-          debug: ${{ github.event.inputs.debug}}
+          ref: ${{ needs.create-branch.outputs.branch_name }}
 
+      - name: Print working branch value
+        if: ${{ github.event.inputs.debug == 'true' }}
+        run: |
+          echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
+          
       - name: Set up JDK 20
         uses: ./.github/actions/setup-java
         with:
@@ -64,10 +68,14 @@ jobs:
     if: ${{ github.event.inputs.incrementVersion == 'true' }}
     steps:
       - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}
-        uses: ./.github/actions/setup-branch
+        uses: actions/checkout@v4
         with:
-          branchName: ${{ needs.create-branch.outputs.branch_name }}
-          debug: ${{ github.event.inputs.debug}}
+          ref: ${{ needs.create-branch.outputs.branch_name }}
+
+      - name: Print working branch value
+        if: ${{ github.event.inputs.debug == 'true' }}
+        run: |
+          echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
 
       - name: Disable local implementation
         run: |
@@ -127,11 +135,15 @@ jobs:
       matrix:
         flavour: [ DevDebug, UatDebug, PreProdDebug, ProdDebug ]
     steps:
-      - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}"
-        uses: ./.github/actions/setup-branch
+      - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}
+        uses: actions/checkout@v4
         with:
-          branchName: ${{ needs.create-branch.outputs.branch_name }}
-          debug: ${{ github.event.inputs.debug}}
+          ref: ${{ needs.create-branch.outputs.branch_name }}
+
+      - name: Print working branch value
+        if: ${{ github.event.inputs.debug == 'true' }}
+        run: |
+          echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
 
       - name: Set up JDK 20
         uses: ./.github/actions/setup-java
@@ -177,11 +189,15 @@ jobs:
       matrix:
         flavour: [ DevRelease, UatRelease, PreProdRelease, ProdRelease ]
     steps:
-      - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}"
-        uses: ./.github/actions/setup-branch
+      - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}
+        uses: actions/checkout@v4
         with:
-          branchName: ${{ needs.create-branch.outputs.branch_name }}
-          debug: ${{ github.event.inputs.debug}}
+          ref: ${{ needs.create-branch.outputs.branch_name }}
+
+      - name: Print working branch value
+        if: ${{ github.event.inputs.debug == 'true' }}
+        run: |
+          echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
 
       - name: Set up JDK 20
         uses: ./.github/actions/setup-java
