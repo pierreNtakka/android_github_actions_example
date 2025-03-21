@@ -7,8 +7,7 @@ runs:
     - name: Print Version properties
       shell: bash
       run: |
-        ls
-        gradlePropertyFileName="../../gradle.properties"
+        gradlePropertyFileName="gradle.properties"
         appDemoVersionCode=$(grep -E "^[^#]*APP_DEMO_VERSION_CODE=" "$gradlePropertyFileName" | cut -d'=' -f2-)
         releaseVersionName=$(grep -E "^[^#]*RELEASE_VERSION_NAME=" "$gradlePropertyFileName" | cut -d'=' -f2-)
         buildMavenSdkVersion=$(grep -E "^[^#]*BUILD_MAVEN_SDK_VERSION=" "$gradlePropertyFileName" | cut -d'=' -f2-)
