@@ -20,21 +20,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Git
-        uses: ./.github/actions/setup-git
-
       - name: Create and push new branch
         id: create_branch
         run: |
-          NEW_BRANCH="creating-release-$(date +%Y%m%d-%H%M%S)"
-          git checkout -b "$NEW_BRANCH"
-          git push origin "$NEW_BRANCH"
-          echo "branch_name=$NEW_BRANCH" >> $GITHUB_OUTPUT
-          echo "New branch $NEW_BRANCH created and pushed"
-
-  testing:
-    needs: create-branch
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}
-        uses: ./.github/actions/setup-frank
+          PACKAGE_NAME="com.pditta.githubactions.mytestlibrary"
+          VERSION="25.03.0.20-prod-release"
+          response=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/user/packages/maven/$PACKAGE_NAME/versions")
+          echo "$response"
