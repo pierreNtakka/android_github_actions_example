@@ -10,7 +10,7 @@ on:
 
 env:
   PACKAGE_NAME: "com.pditta.githubactions.mytestlibrary"
-  VERSION_PREFIX: "25.03.0.19"
+  VERSION_PREFIX: "25.03.0.20"
 
 jobs:
   clean-package-registry:
