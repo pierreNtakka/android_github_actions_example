@@ -15,6 +15,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Info ls
+        run: |
+          ls -la .github/actions/print-gradle-properties/
 
       - name: Test composite
         if: ${{ github.event.inputs.debug == 'true'}}
