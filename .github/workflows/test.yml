@@ -39,7 +39,7 @@ jobs:
       - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}
         uses: ./.github/actions/setup-branch
         with:
-          ref: ${{ needs.create-branch.outputs.branch_name }}
+          branchName: ${{ needs.create-branch.outputs.branch_name }}
           debug: ${{ github.event.inputs.debug }}
 
           
