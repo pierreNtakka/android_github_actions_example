@@ -34,7 +34,7 @@ jobs:
           # Estrai l'ID della versione specifica (cerca per il nome della versione)
           version_id=$(echo "$response" | jq -r ".[] | select(.name == \"$VERSION_TO_DELETE\") | .id")
           
-          echo "$version_id"
+          echo "La version è $version_id ----"
           
           # Verifica se abbiamo trovato l'ID
           if [ "$version_id" != "null" ]; then
