@@ -13,7 +13,7 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Checkout branch ${{ inputs.branchName }}"
+    - name: Checkout branch ${{ inputs.branchName }}
       uses: actions/checkout@v4
       with:
         ref: ${{ inputs.branchName }}
@@ -22,5 +22,4 @@ runs:
       if: ${{ inputs.debug == 'true' }}
       shell: bash
       run: |
-        branchName = ${{ inputs.branchName }}
-        echo "Working branch is: $branchName"
+        echo "Working branch is: ${{ inputs.branchName }}"
