@@ -1,4 +1,4 @@
-name: 'Checkout Branch'
+name: 'Test'
 description: 'Checkout the specific branch name'
 
 inputs:
@@ -13,11 +13,6 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Checkout branch ${{ inputs.branchName }}
-      uses: actions/checkout@v4
-      with:
-        ref: ${{ inputs.branchName }}
-
     - name: Print working branch value
       if: ${{ inputs.debug == 'true' }}
       shell: bash
