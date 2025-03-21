@@ -21,4 +21,4 @@ jobs:
           ls
           pwd
       - name: Test composite
-        uses: ./../actions/print-gradle-properties/action.yml
+        uses: ./.github/actions/print-gradle-properties/action.yml
