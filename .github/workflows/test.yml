@@ -40,7 +40,7 @@ jobs:
           echo "$version_id"
           
           # Verifica se abbiamo trovato l'ID
-          if [ -z "$version_id" ]; then
+          if [ -n "$version_id" ] && [ "$version_id" -gt 0 ]; then
             echo "La versione $VERSION_TO_DELETE esiste, procedo con la cancellazione."
 
             delete_response=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE \
