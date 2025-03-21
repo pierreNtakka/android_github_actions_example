@@ -29,15 +29,15 @@ jobs:
             "https://api.github.com/user/packages/maven/$PACKAGE_NAME/versions")
 
           # Estrai l'ID della versione specifica (cerca per il nome della versione)
-          version_id=$(echo "$response" | jq -r ".[] | select(.name == \"$VERSION\") | .id")
+          version_id=$(echo "$response" | jq -r ".[] | select(.name == \"$VERSION_TO_DELETE\") | .id")
           
           # Verifica se abbiamo trovato l'ID
           if [ "$version_id" != "null" ]; then
-            echo "La versione $VERSION esiste, procedo con la cancellazione."
+            echo "La versione $VERSION_TO_DELETE esiste, procedo con la cancellazione."
             # Cancella la versione usando l'ID
             curl -X DELETE \
                  -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
                  "https://api.github.com/user/packages/maven/$PACKAGE_NAME/versions/$version_id"
           else
-            echo "La versione $VERSION non esiste, niente da cancellare."
+            echo "La versione $VERSION_TO_DELETE non esiste, niente da cancellare."
           fi
