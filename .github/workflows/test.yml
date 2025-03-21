@@ -36,6 +36,11 @@ jobs:
     needs: create-branch
     runs-on: ubuntu-latest
     steps:
+
+      - name: Print Java (debug only)
+        shell: bash
+        run: ls -lrt .github/actions
+
       - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}
         uses: ./.github/actions/setup-branch
         with:
