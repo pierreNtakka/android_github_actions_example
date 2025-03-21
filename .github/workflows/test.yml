@@ -37,7 +37,7 @@ jobs:
           echo "La version è $version_id ----"
           
           # Verifica se abbiamo trovato l'ID
-          if [ "$version_id" != "null" ]; then
+          if [ -z "version_id" ]; then
             echo "La versione $VERSION_TO_DELETE esiste, procedo con la cancellazione."
           
             delete_response=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE \
