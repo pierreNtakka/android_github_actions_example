@@ -26,4 +26,5 @@ jobs:
         if: ${{ github.event.inputs.debug == 'true'}}
         uses: ./.github/actions/print-gradle-properties
         with:
+          debug: ${{ github.event.inputs.debug}}
           gradleFileName: ${{ env.GRADLE_PROPERTIES_FILENAME }}

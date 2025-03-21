@@ -5,11 +5,15 @@ inputs:
   gradleFileName:
     description: "The gradle file name"
     required: true
+  debug:
+    description: "THe debug option is enabled"
+    required: true
 
 runs:
   using: 'composite'
   steps:
     - name: Print Version properties
+      if: ${{ inputs.debug == 'true'}}
       shell: bash
       run: |
         appDemoVersionCode=$(grep -E "^[^#]*APP_DEMO_VERSION_CODE=" "${{ inputs.gradleFileName }}" | cut -d'=' -f2-)
