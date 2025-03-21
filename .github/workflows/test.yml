@@ -22,7 +22,7 @@ jobs:
       - name: Delete ${{ env.VERSION_TO_DELETE }}
         id: delete_pkg_registry
         env:
-          VERSION_TO_DELETE: $VERSION_PREFIX-${{ matrix.flavour }}
+          VERSION_TO_DELETE: ${{ env.VERSION_PREFIX }}-${{ matrix.flavour }}
         run: |
           # Ottieni tutte le versioni del pacchetto
           response=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
