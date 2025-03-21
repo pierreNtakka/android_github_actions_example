@@ -33,7 +33,7 @@ jobs:
           
           # Estrai l'ID della versione specifica (cerca per il nome della versione)
           version_id=$(echo "$response" | jq -r ".[] | select(.name == \"$VERSION_TO_DELETE\") | .id")
-         
+          
           # Verifica se abbiamo trovato l'ID
           if [ -z "version_id" ]; then
             echo "La versione $VERSION_TO_DELETE esiste, procedo con la cancellazione."
@@ -54,3 +54,16 @@ jobs:
           else
             echo "La versione $VERSION_TO_DELETE non esiste, niente da cancellare."
           fi
+
+  remove-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Set up Git
+        uses: ./.github/actions/setup-git
+
+      - name: Delete tag ${{env.VERSION_PREFIX}}
+        run: |
+          git push origin --delete ${{env.VERSION_PREFIX}}
