@@ -18,8 +18,3 @@ runs:
       shell: bash
       run: |
         echo "Working branch is: ${{ inputs.branchName }}"
-
-    - name: Checkout branch ${{ inputs.branchName }}
-      uses: actions/checkout@v4
-      with:
-        ref: ${{ inputs.branchName }}
