@@ -5,8 +5,8 @@ runs:
   using: 'composite'
   steps:
     - name: Print Version properties
-      shell: bash
       if: ${{ github.event.inputs.debug == 'true'}}
+      shell: bash
       run: |
         ls
         gradlePropertyFileName="../../gradle.properties"

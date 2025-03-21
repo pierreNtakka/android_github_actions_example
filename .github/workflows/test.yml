@@ -16,20 +16,5 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Print Version properties PRE incremented
-        if: ${{ github.event.inputs.debug == 'true'}}
-        run: |
-          gradlePropertyFileName="gradle.properties"
-  
-          appDemoVersionCode=$(grep -E "^[^#]*APP_DEMO_VERSION_CODE=" "$gradlePropertyFileName" | cut -d'=' -f2-)
-          releaseVersionName=$(grep -E "^[^#]*RELEASE_VERSION_NAME=" "$gradlePropertyFileName" | cut -d'=' -f2-)
-          buildMavenSdkVersion=$(grep -E "^[^#]*BUILD_MAVEN_SDK_VERSION=" "$gradlePropertyFileName" | cut -d'=' -f2-)
-          enableLocalImpl=$(grep -E "^[^#]*ENABLE_LOCAL_IMPLEMENTATION=" "$gradlePropertyFileName" | cut -d'=' -f2-)
-  
-          echo "APP_DEMO_VERSION_CODE=$appDemoVersionCode"
-          echo "RELEASE_VERSION_NAME=$releaseVersionName"
-          echo "BUILD_MAVEN_SDK_VERSION=$buildMavenSdkVersion"
-          echo "ENABLE_LOCAL_IMPLEMENTATION=$enableLocalImpl"
+      - name: Test composite
+        uses: ../actions/print-gradle-properties/action.yml
