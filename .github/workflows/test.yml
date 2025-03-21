@@ -38,7 +38,3 @@ jobs:
     steps:
       - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}
         uses: ./.github/actions/setup-frank
-
-          
-
-    
