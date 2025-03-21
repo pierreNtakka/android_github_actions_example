@@ -25,6 +25,20 @@ jobs:
         run: |
           PACKAGE_NAME="com.pditta.githubactions.mytestlibrary"
           VERSION="25.03.0.20-prod-release"
+          # Ottieni tutte le versioni del pacchetto
           response=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/user/packages/maven/$PACKAGE_NAME/versions/$VERSION")
-          echo "$response"
+            "https://api.github.com/user/packages/maven/$PACKAGE_NAME/versions")
+
+          # Estrai l'ID della versione specifica (cerca per il nome della versione)
+          version_id=$(echo "$response" | jq -r ".[] | select(.name == \"$VERSION\") | .id")
+  
+          # Verifica se abbiamo trovato l'ID
+          if [ "$version_id" != "null" ]; then
+            echo "La versione $VERSION esiste, procedo con la cancellazione."
+            # Cancella la versione usando l'ID
+            curl -X DELETE \
+                 -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                 "https://api.github.com/user/packages/maven/$PACKAGE_NAME/versions/$version_id"
+          else
+            echo "La versione $VERSION non esiste, niente da cancellare."
+          fi
