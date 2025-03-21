@@ -10,7 +10,7 @@ on:
 
 env:
   PACKAGE_NAME: "com.pditta.githubactions.mytestlibrary"
-  VERSION_PREFIX: "25.03.0.20"
+  VERSION_PREFIX: "25.03.0.19"
 
 jobs:
   clean-package-registry:
@@ -23,6 +23,7 @@ jobs:
         id: delete_pkg_registry
         env:
           VERSION_TO_DELETE: ${{ env.VERSION_PREFIX }}-${{ matrix.flavour }}
+        shell: bash
         run: |
           # Ottieni tutte le versioni del pacchetto
           response=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
@@ -34,10 +35,20 @@ jobs:
           # Verifica se abbiamo trovato l'ID
           if [ "$version_id" != "null" ]; then
             echo "La versione $VERSION_TO_DELETE esiste, procedo con la cancellazione."
-            # Cancella la versione usando l'ID
-            curl -X DELETE \
-                 -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-                 "https://api.github.com/user/packages/maven/$PACKAGE_NAME/versions/$version_id"
+          
+            delete_response=$(curl -X DELETE \
+                   -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                   "https://api.github.com/user/packages/maven/$PACKAGE_NAME/versions/$version_id")
+          
+            if [ "$delete_response" -eq 204 ]; then
+              echo "La versione $VERSION_TO_DELETE è stata cancellata con successo."
+            elif [ "$delete_response" -eq 404 ]; then
+              echo "Errore: La versione $VERSION_TO_DELETE non è stata trovata per la cancellazione."
+              exit 1
+            else
+              echo "Errore nella cancellazione. Codice di stato: $delete_response"
+              exit 1
+            fi
           else
             echo "La versione $VERSION_TO_DELETE non esiste, niente da cancellare."
           fi
