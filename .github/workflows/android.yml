@@ -100,6 +100,7 @@ jobs:
         if: ${{ github.event.inputs.debug == 'true'}}
         run: |
           gradlePropertyFileName="gradle.properties"
+          
           appDemoVersionCode=$(grep -E "^[^#]*APP_DEMO_VERSION_CODE=" "$gradlePropertyFileName" | cut -d'=' -f2-)
           releaseVersionName=$(grep -E "^[^#]*RELEASE_VERSION_NAME=" "$gradlePropertyFileName" | cut -d'=' -f2-)
           buildMavenSdkVersion=$(grep -E "^[^#]*BUILD_MAVEN_SDK_VERSION=" "$gradlePropertyFileName" | cut -d'=' -f2-)
@@ -109,7 +110,7 @@ jobs:
           echo "RELEASE_VERSION_NAME=$releaseVersionName"
           echo "BUILD_MAVEN_SDK_VERSION=$buildMavenSdkVersion"
           echo "ENABLE_LOCAL_IMPLEMENTATION=$enableLocalImpl"
-        
+
 
       - name: Increment App and SDK Version
         run: |
