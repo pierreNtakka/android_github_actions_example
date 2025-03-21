@@ -1,0 +1,17 @@
+name: 'Setup Firebase Credentials'
+description: 'Creates Firebase App Distribution credentials file'
+
+inputs:
+  app_distr_key:
+    description: 'Firebase App Distribution key content'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Create Firebase App Keys
+      shell: bash
+      run: |
+        mkdir -p config
+        python -c "import os; open('config/firebase-app-distr-key.json', 'w').write('${{ inputs.app_distr_key }}')"
+        echo "GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY=$PWD/config/firebase-app-distr-key.json" >> $GITHUB_ENV
