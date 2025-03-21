@@ -12,10 +12,10 @@ runs:
     - name: Print Version properties
       shell: bash
       run: |
-        appDemoVersionCode=$(grep -E "^[^#]*APP_DEMO_VERSION_CODE=" "${{ inputs.MY_SECRET }}" | cut -d'=' -f2-)
-        releaseVersionName=$(grep -E "^[^#]*RELEASE_VERSION_NAME=" "${{ inputs.MY_SECRET }}" | cut -d'=' -f2-)
-        buildMavenSdkVersion=$(grep -E "^[^#]*BUILD_MAVEN_SDK_VERSION=" "${{ inputs.MY_SECRET }}" | cut -d'=' -f2-)
-        enableLocalImpl=$(grep -E "^[^#]*ENABLE_LOCAL_IMPLEMENTATION=" "${{ inputs.MY_SECRET }}" | cut -d'=' -f2-)
+        appDemoVersionCode=$(grep -E "^[^#]*APP_DEMO_VERSION_CODE=" "${{ inputs.gradleFileName }}" | cut -d'=' -f2-)
+        releaseVersionName=$(grep -E "^[^#]*RELEASE_VERSION_NAME=" "${{ inputs.gradleFileName }}" | cut -d'=' -f2-)
+        buildMavenSdkVersion=$(grep -E "^[^#]*BUILD_MAVEN_SDK_VERSION=" "${{ inputs.gradleFileName }}" | cut -d'=' -f2-)
+        enableLocalImpl=$(grep -E "^[^#]*ENABLE_LOCAL_IMPLEMENTATION=" "${{ inputs.gradleFileName }}" | cut -d'=' -f2-)
         
         echo "APP_DEMO_VERSION_CODE=$appDemoVersionCode"
         echo "RELEASE_VERSION_NAME=$releaseVersionName"
