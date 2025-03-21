@@ -12,10 +12,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Test composite
-        run: |
-          ls
-          pwd
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+
       - name: Test composite
         if: ${{ github.event.inputs.debug == 'true'}}
         uses: ./.github/workflows/action.yml
