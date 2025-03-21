@@ -10,8 +10,8 @@ on:
 
 env:
   PACKAGE_NAME: "com.pditta.githubactions.mytestlibrary"
-  VERSION_PREFIX: "25.03.0.20"
-  TAG_NAME: "25.03.0.20"
+  VERSION_PREFIX: "25.03.0.19"
+  TAG_NAME: "25.03.0.19"
 
 jobs:
   clean-package-registry:
@@ -68,13 +68,13 @@ jobs:
       - name: Check if Tag Exists
         id: check_tag
         run: |
-          if git ls-remote --tags origin | grep -q "refs/tags/${{ env.TAG_NAME }}$"; then
+          if git ls-remote --tags origin | grep -q "refs/tags/${{ env.TAG_NAME }}"; then
             echo "TAG_EXISTS=true" >> $GITHUB_OUTPUT
           else
             echo "TAG_EXISTS=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Delete Git Tag
-        if: ${{ steps.create_git_tag.outputs.GIT_TAG_NAME == 'true' }}
+        if: ${{ steps.check_tag.outputs.TAG_EXISTS == 'true' }}
         run: |
-          git push origin --delete ${{ github.event.inputs.tag_name }}
+          git push origin --delete ${{ env.TAG_NAME }}
