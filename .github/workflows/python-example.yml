@@ -17,5 +17,8 @@ jobs:
   python-version:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Controlla versione Python
-        run: python --version
+        run: python scripts/check_python_version.py
