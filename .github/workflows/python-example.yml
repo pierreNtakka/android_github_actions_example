@@ -3,10 +3,6 @@ name: Python Example
 on:
   workflow_dispatch:
     inputs:
-      versionToDelete:
-        type: string
-        description: Specificare la versione da cancellare
-        required: true
       debug:
         type: boolean
         description: Printa dei valori che aiutano il debug
@@ -17,6 +13,9 @@ jobs:
   python-version:
     runs-on: ubuntu-latest
     steps:
+      - name: Install Python dependencies
+        run: pip install requests
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
