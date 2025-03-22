@@ -52,11 +52,15 @@ jobs:
       - name: Set up Gradlew
         uses: ./.github/actions/setup-gradle
         with:
-          debug: ${{ github.event.inputs.debug }}
+          debug: ${{ github.event.inputs.debug }} 
 
-      - name: Execute testing
+      - name: Execute clean
         run: |
-          ./gradlew :app:testing
+          ./gradlew clean
+
+      - name: Execute test
+        run: |
+          ./gradlew test
 
   increment-version:
     needs: [ create-branch, testing ]
@@ -90,7 +94,7 @@ jobs:
 
       - name: Set up Git
         uses: ./.github/actions/setup-git
-            
+
       - name: Commit And Push
         run: |
           git add .
