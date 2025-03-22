@@ -58,6 +58,5 @@ def main():
     else:
         print(f"La release associata al tag {tag_to_delete} non esiste, niente da cancellare.")
 
-
 if __name__ == "__main__":
     main()
