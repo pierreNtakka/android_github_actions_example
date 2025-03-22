@@ -1,0 +1,22 @@
+name: Python Example
+
+on:
+  workflow_dispatch:
+    inputs:
+      versionToDelete:
+        type: string
+        description: Specificare la versione da cancellare
+        required: true
+      debug:
+        type: boolean
+        description: Printa dei valori che aiutano il debug
+        default: true
+
+
+jobs:
+  python-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout python version
+        shell: python
+        run: python --version
