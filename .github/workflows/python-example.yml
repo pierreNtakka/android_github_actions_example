@@ -22,7 +22,6 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Controlla versione Python
-        shell: python
         run: python scripts/check_python_version.py
   
   clean-package-registry:
@@ -36,5 +35,4 @@ jobs:
         id: delete_pkg_registry
         env:
           VERSION_TO_DELETE: ${{ inputs.versionToDelete }}-${{ matrix.flavour }}
-        shell: python
         run: python scripts/delete_pkg_registry.py
