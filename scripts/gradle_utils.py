@@ -13,10 +13,6 @@ def read_gradle_properties(file_name):
         sys.exit(1)
     return properties
 
-def read_value_from_properties(file_name, key):
-    properties = read_gradle_properties(file_name)
-    return properties.get(key, None)
-
 
 def update_gradle_properties(file_name, properties):
     lines = []

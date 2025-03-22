@@ -69,34 +69,32 @@ jobs:
           ref: ${{ needs.create-branch.outputs.branch_name }}
 
       - name: Print working branch value
-        if: ${{ github.event.inputs.debug == 'true' }}
+        if: ${{ inputs.debug == 'true' }}
         run: |
           echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
 
       - name: Disable local implementation
-        run: |
-          sed -i "s|^ENABLE_LOCAL_IMPLEMENTATION=.*|ENABLE_LOCAL_IMPLEMENTATION=false|" "$GRADLE_PROPERTIES_FILENAME"
+        run: python scripts/toggle_gradle_local_impl.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }} --enable false
 
       - name: Print Version properties PRE incremented
-        run: python scripts/print_gradle_properties.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }} --debug ${{ inputs.debug }}
+        if: ${{ inputs.debug == 'true' }}
+        run: python scripts/print_gradle_properties.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
         
       - name: Increment App and SDK Version
+        id: increment_app_sdk_version
         run: python scripts/increment_version.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
 
-      - name: Print Version properties POST incremented
-        run: python scripts/print_gradle_properties.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }} --debug ${{ inputs.debug }}
+      - name: Print Version properties POST incremented 
+        if: ${{ inputs.debug == 'true' }}
+        run: python scripts/print_gradle_properties.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
 
       - name: Set up Git
         uses: ./.github/actions/setup-git
-      
-      - name: Commit And Push the incremented Version
+            
+      - name: Commit And Push
         run: |
-          appDemoVersionCode=$(grep -E "^[^#]*APP_DEMO_VERSION_CODE=" "$GRADLE_PROPERTIES_FILENAME" | cut -d'=' -f2-)
-          releaseVersionName=$(grep -E "^[^#]*RELEASE_VERSION_NAME=" "$GRADLE_PROPERTIES_FILENAME" | cut -d'=' -f2-)
-          buildMavenSdkVersion=$(grep -E "^[^#]*BUILD_MAVEN_SDK_VERSION=" "$GRADLE_PROPERTIES_FILENAME" | cut -d'=' -f2-)
-          
           git add .
-          git commit -m "chore: Update app versionCode to: $appDemoVersionCode and versionName: $releaseVersionName and maven version $buildMavenSdkVersion"
+          git commit -m " ${{ steps.increment_app_sdk_version.outputs.commit_message }}"
           git push
 
   upload-app-demo:
@@ -126,20 +124,8 @@ jobs:
 
       - name: Clean up JSON file and environment variable
         if: always()
-        run: |
-          # Remove the file if it exists
-          if [ -f "$GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY" ]; then
-            rm $GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY
-            echo "JSON file removed."
-          else
-            echo "No JSON file found."
-          fi
-          
-          # Remove the environment variable
-          echo "Removing the GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY environment variable."
-          unset GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY
+        run: python scripts/remove_app_distr.py
   
-
   upload-sdk:
     needs: [ create-branch, increment-version, testing ]
     runs-on: ubuntu-latest
@@ -177,14 +163,18 @@ jobs:
         run: |
           git fetch origin ${{ needs.create-branch.outputs.branch_name }}
           git merge origin/${{ needs.create-branch.outputs.branch_name }}
-          
-          sed -i "s|^ENABLE_LOCAL_IMPLEMENTATION=.*|ENABLE_LOCAL_IMPLEMENTATION=true|" "$GRADLE_PROPERTIES_FILENAME"
-          sed -i "s|^IS_FIRST_RELEASE=.*|IS_FIRST_RELEASE=false|" "$GRADLE_PROPERTIES_FILENAME"
-          sed -i "s|^IS_FIRST_RELEASE=.*|IS_FIRST_RELEASE=false|" "$GRADLE_PROPERTIES_FILENAME"
 
-          git add .
-          git commit -m "chore: enable local implementation"
-          git push
+      - name: Enable local implementation
+        run: python scripts/toggle_gradle_local_impl.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }} --enable true
+
+      - name: Set to false is first release
+        run: python scripts/not_first_release.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
+  
+      - name: Commit and push the merge
+        run: |
+            git add .
+            git commit -m "chore: enable local implementation"
+            git push
 
       - name: Git Tag
         id: create_git_tag
