@@ -7,7 +7,7 @@ on:
         type: string
         description: Specificare la versione da cancellare
         required: true
-        default: '25.03.0.18'
+        default: '25.03.0.16'
       debug:
         type: boolean
         description: Printa dei valori che aiutano il debug

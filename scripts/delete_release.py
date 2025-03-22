@@ -8,10 +8,21 @@ def get_release_id(tag_to_delete, github_repository, github_token):
         "Authorization": f"Bearer {github_token}"
     }
     response = requests.get(url, headers=headers)
-    releases = response.json()
+    
+    status_code = response.status_code
+    if status_code == 200:
+        print(f"La release associata al tag {tag_to_delete} è stata trovata.")
+        releases = response.json()
 
-    return releases['id']
-
+        if 'id' in releases:
+            return releases['id']
+        else:
+            print(f"Errore: Nessun ID trovato per il tag {tag_to_delete}.")
+        return None
+    
+    else:
+        print(f"Errore: La release associata al tag {tag_to_delete} non è stata trovata.")
+        return None
 
 def delete_release(github_repository, release_id, github_token):
     url = f"https://api.github.com/repos/{github_repository}/releases/{release_id}"
