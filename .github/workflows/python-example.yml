@@ -31,6 +31,9 @@ jobs:
       matrix:
         flavour: [ dev-release, uat-release, preProd-release, prod-release ]
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
       - name: Delete ${{ env.VERSION_TO_DELETE }}
         id: delete_pkg_registry
         env:
