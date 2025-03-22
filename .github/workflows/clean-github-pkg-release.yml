@@ -1,4 +1,4 @@
-name: Clean GitHub from  a specific Version
+name: Delete GitHub Package Registry and Release
 
 on:
   workflow_dispatch:
@@ -7,88 +7,45 @@ on:
         type: string
         description: Specificare la versione da cancellare
         required: true
-      debug:
-        type: boolean
-        description: Printa dei valori che aiutano il debug
-        default: true
 
 env:
   PACKAGE_NAME: "com.pditta.githubactions.mytestlibrary"
 
 jobs:
-  clean-package-registry:
+  delete-package-registry:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         flavour: [ dev-release, uat-release, preProd-release, prod-release ]
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
       - name: Delete ${{ env.VERSION_TO_DELETE }}
         id: delete_pkg_registry
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION_TO_DELETE: ${{ inputs.versionToDelete }}-${{ matrix.flavour }}
-        shell: bash
-        run: |
-          # Ottieni tutte le versioni del pacchetto
-          response=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/user/packages/maven/$PACKAGE_NAME/versions")
+        run: python scripts/delete_pkg_registry.py
 
-          echo "$response"
-
-          # Estrai l'ID della versione specifica (cerca per il nome della versione)
-          version_id=$(echo "$response" | jq -r ".[] | select(.name == \"$VERSION_TO_DELETE\") | .id")
-          
-          echo "$version_id"
-          
-          # Verifica se abbiamo trovato l'ID
-          if [ -n "$version_id" ] && [ "$version_id" -gt 0 ]; then
-            echo "La versione $VERSION_TO_DELETE esiste, procedo con la cancellazione."
-
-            delete_response=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE \
-                                -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-                                "https://api.github.com/user/packages/maven/$PACKAGE_NAME/versions/$version_id")
-
-            if [ "$delete_response" -eq 204 ]; then
-              echo "La versione $VERSION_TO_DELETE è stata cancellata con successo."
-            elif [ "$delete_response" -eq 404 ]; then
-              echo "Errore: La versione $VERSION_TO_DELETE non è stata trovata per la cancellazione."
-              exit 1
-            else
-              echo "Errore nella cancellazione. Codice di stato: $delete_response"
-              exit 1
-            fi
-          else
-            echo "La versione $VERSION_TO_DELETE non esiste, niente da cancellare."
-          fi
-
-  remove-release:
+  delete-release:
     runs-on: ubuntu-latest
+    needs: delete-package-registry
     steps:
-      - name: Delete GitHub Release
-        run: |
-          release_id=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            "https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ inputs.versionToDelete }}" | jq -r '.id')
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-          if [ "$release_id" != "null" ]; then
-            delete_response=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE \
-              -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-              "https://api.github.com/repos/${{ github.repository }}/releases/$release_id")
-
-            if [ "$delete_response" -eq 204 ]; then
-              echo "La release associata al tag ${{ inputs.versionToDelete }} è stata cancellata con successo."
-            elif [ "$delete_response" -eq 404 ]; then
-              echo "Errore: La release associata al tag ${{ inputs.versionToDelete }} non è stata trovata per la cancellazione."
-              exit 1
-            else
-              echo "Errore nella cancellazione della release. Codice di stato: $delete_response"
-              exit 1
-            fi
-          else
-            echo "Nessuna release associata al tag ${{ inputs.versionToDelete }} trovata."
-          fi
-
+      - name: Delete Release
+        id: delete_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_TO_DELETE: ${{ inputs.versionToDelete }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python scripts/delete_release.py
+  
   remove-tag:
     runs-on: ubuntu-latest
-    needs: remove-release
+    needs: delete-release
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4
