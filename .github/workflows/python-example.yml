@@ -7,12 +7,15 @@ on:
         type: string
         description: Specificare la versione da cancellare
         required: true
-        default: '25.03.0'
+        default: '25.03.0.18'
       debug:
         type: boolean
         description: Printa dei valori che aiutano il debug
         default: true
 
+
+env:
+  PACKAGE_NAME: "com.pditta.githubactions.mytestlibrary"
 
 jobs:
   python-version:
@@ -33,9 +36,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
+
       - name: Delete ${{ env.VERSION_TO_DELETE }}
         id: delete_pkg_registry
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION_TO_DELETE: ${{ inputs.versionToDelete }}-${{ matrix.flavour }}
         run: python scripts/delete_pkg_registry.py
