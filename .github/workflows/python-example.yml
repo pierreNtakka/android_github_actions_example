@@ -17,6 +17,5 @@ jobs:
   python-version:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout python version
-        shell: python
+      - name: Controlla versione Python
         run: python --version
