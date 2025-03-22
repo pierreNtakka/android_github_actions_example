@@ -12,7 +12,7 @@ def get_version_id(package_name, version_to_delete, github_token):
     status_code = response.status_code
     
     if status_code == 200:
-        print(f"La release associata al tag {tag_to_delete} è stata trovata.")
+        print(f"La release associata al tag {version_to_delete} è stata trovata.")
         versions = response.json()
     
         for version in versions:

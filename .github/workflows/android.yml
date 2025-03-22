@@ -117,7 +117,9 @@ jobs:
           echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
 
       - name: Create Firebase App Keys
-        run: python scripts/config_app_distr.py --appDistrAuthFileJson ${{ secrets.APP_DISTR_FILE_CONTENT_KEY }}
+        env:
+          APP_DISTR_FILE_CONTENT_KEY: ${{ secrets.APP_DISTR_FILE_CONTENT_KEY }}
+        run: python scripts/config_app_distr.py
 
       - name: Upload App Demo ${{ matrix.flavour }}
         run: ./gradlew uploadToAppDistribution${{ matrix.flavour }}
