@@ -128,7 +128,7 @@ jobs:
 
       - name: Clean up JSON file and environment variable
         if: always()
-        run: python scripts/remove_app_distr.py
+        run: python scripts/remove_config_app_dist.py
   
   upload-sdk:
     needs: [ create-branch, increment-version, testing ]
