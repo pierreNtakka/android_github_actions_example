@@ -32,8 +32,6 @@ def delete_release(github_repository, release_id, github_token):
     response = requests.delete(url, headers=headers)
     return response.status_code
 
-
-
 def main():
     git_hub_repository = os.getenv('GITHUB_REPOSITORY')
     tag_to_delete = os.getenv('TAG_TO_DELETE')

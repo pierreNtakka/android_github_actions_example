@@ -13,9 +13,7 @@ on:
         default: true
 env:
   GRADLE_PROPERTIES_FILENAME: "gradle.properties"
-  JAVA_VERSION: "20"
-  JAVA_DISTRIBUTION: "temurin"
-
+  
 jobs:
   create-branch:
     runs-on: ubuntu-latest
@@ -51,11 +49,9 @@ jobs:
         run: |
           echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
           
-      - name: Set up JDK 20
-        uses: ./.github/actions/setup-java
+      - name: Set up Gradlew
+        uses: ./.github/actions/setup-gradle
         with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
           debug: ${{ github.event.inputs.debug }}
 
       - name: Execute testing
@@ -82,40 +78,17 @@ jobs:
           sed -i "s|^ENABLE_LOCAL_IMPLEMENTATION=.*|ENABLE_LOCAL_IMPLEMENTATION=false|" "$GRADLE_PROPERTIES_FILENAME"
 
       - name: Print Version properties PRE incremented
-        uses: ./.github/actions/print-gradle-properties
-        with:
-          gradleFileName: ${{ env.GRADLE_PROPERTIES_FILENAME }}
-          debug: ${{ github.event.inputs.debug}}
-
+        run: python scripts/print_gradle_properties.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }} --debug ${{ inputs.debug }}
+        
       - name: Increment App and SDK Version
-        run: |
-          IS_FIRST_RELEASE=$(grep -E "^IS_FIRST_RELEASE=" "$GRADLE_PROPERTIES_FILENAME" | cut -d'=' -f2)
-          IS_FIRST_MAVEN_RELEASE=$(grep -E "^IS_FIRST_MAVEN_RELEASE=" "$GRADLE_PROPERTIES_FILENAME" | cut -d'=' -f2)
-          APP_DEMO_VERSION_CODE=$(grep -E "^APP_DEMO_VERSION_CODE=" "$GRADLE_PROPERTIES_FILENAME" | cut -d'=' -f2)
-          BUILD_MAVEN_SDK_VERSION=$(grep -E "^BUILD_MAVEN_SDK_VERSION=" "$GRADLE_PROPERTIES_FILENAME" | cut -d'=' -f2)
-          
-          if [ "$IS_FIRST_RELEASE" == "false" ]; then
-            NEW_APP_DEMO_VERSION_CODE=$((APP_DEMO_VERSION_CODE + 1))
-            sed -i "s/^APP_DEMO_VERSION_CODE=.*/APP_DEMO_VERSION_CODE=$NEW_APP_DEMO_VERSION_CODE/" "$GRADLE_PROPERTIES_FILENAME"
-          fi
-          
-          if [ "$IS_FIRST_MAVEN_RELEASE" == "false" ]; then
-            PREFIX=$(echo "$BUILD_MAVEN_SDK_VERSION" | rev | cut -d'.' -f2- | rev) 
-            LAST_NUMBER=$(echo "$BUILD_MAVEN_SDK_VERSION" | rev | cut -d'.' -f1 | rev) 
-            NEW_LAST_NUMBER=$((LAST_NUMBER + 1))
-            NEW_BUILD_MAVEN_SDK_VERSION="$PREFIX.$NEW_LAST_NUMBER"
-            sed -i "s/^BUILD_MAVEN_SDK_VERSION=.*/BUILD_MAVEN_SDK_VERSION=$NEW_BUILD_MAVEN_SDK_VERSION/" "$GRADLE_PROPERTIES_FILENAME"
-          fi
+        run: python scripts/increment_version.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
 
       - name: Print Version properties POST incremented
-        uses: ./.github/actions/print-gradle-properties
-        with:
-          debug: ${{ github.event.inputs.debug}}
-          gradleFileName: ${{ env.GRADLE_PROPERTIES_FILENAME }}
+        run: python scripts/print_gradle_properties.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }} --debug ${{ inputs.debug }}
 
       - name: Set up Git
         uses: ./.github/actions/setup-git
-
+      
       - name: Commit And Push the incremented Version
         run: |
           appDemoVersionCode=$(grep -E "^[^#]*APP_DEMO_VERSION_CODE=" "$GRADLE_PROPERTIES_FILENAME" | cut -d'=' -f2-)
@@ -143,20 +116,8 @@ jobs:
         run: |
           echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
 
-      - name: Set up JDK 20
-        uses: ./.github/actions/setup-java
-        with:
-          java-version: ${{ env.JAVA_VERSION }}
-          distribution: ${{ env.JAVA_DISTRIBUTION }}
-          debug: ${{ github.event.inputs.debug }}
-
       - name: Create Firebase App Keys
-        env:
-          APP_DISTR_FILE_CONTENT_KEY: ${{ secrets.APP_DISTR_FILE_CONTENT_KEY }}
-        run: |
-          mkdir -p config
-          python -c "import os; open('config/firebase-app-distr-key.json', 'w').write(os.getenv('APP_DISTR_FILE_CONTENT_KEY'))"
-          echo "GITHUB_ACTIONS_EXAMPLE_APP_DISTR_FILE_KEY=$PWD/config/firebase-app-distr-key.json" >> $GITHUB_ENV
+        run: python scripts/config_app_distr.py --appDistrAuthFileJson ${{ secrets.APP_DISTR_FILE_CONTENT_KEY }}
 
       - name: Upload App Demo ${{ matrix.flavour }}
         run: ./gradlew uploadToAppDistribution${{ matrix.flavour }}
@@ -196,14 +157,7 @@ jobs:
         if: ${{ github.event.inputs.debug == 'true' }}
         run: |
           echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
-
-      - name: Set up JDK 20
-        uses: ./.github/actions/setup-java
-        with:
-          java-version: ${{ env.JAVA_VERSION  }}
-          distribution: ${{ env.JAVA_DISTRIBUTION  }}
-          debug: ${{ github.event.inputs.debug }}
-
+          
       - name: Upload SDK ${{ matrix.flavour }}
         run: ./gradlew uploadToGitHubPkg${{ matrix.flavour }}
 
