@@ -8,13 +8,21 @@ def get_version_id(package_name, version_to_delete, github_token):
         "Authorization": f"Bearer {github_token}"
     }
     response = requests.get(url, headers=headers)
-    response.raise_for_status()
-    versions = response.json()
     
-    for version in versions:
-        if version['name'] == version_to_delete:
-            return version['id']
-    return None
+    status_code = response.status_code
+    
+    if status_code == 200:
+        print(f"La release associata al tag {tag_to_delete} è stata trovata.")
+        versions = response.json()
+    
+        for version in versions:
+            if version['name'] == version_to_delete:
+                return version['id']
+        return None 
+    else :
+        print(f"Errore: La richiesta non è andata a buon fine. Codice di stato: {status_code}")
+        return None 
+   
 
 def delete_version(package_name, version_id, github_token):
     url = f"https://api.github.com/user/packages/maven/{package_name}/versions/{version_id}"
