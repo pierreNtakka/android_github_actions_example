@@ -17,18 +17,8 @@ env:
   PACKAGE_NAME: "com.pditta.githubactions.mytestlibrary"
 
 jobs:
-  python-version:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Controlla versione Python
-        run: python scripts/check_python_version.py
-  
   delete-package-registry:
     runs-on: ubuntu-latest
-    needs: python-version
     strategy:
       matrix:
         flavour: [ dev-release, uat-release, preProd-release, prod-release ]
