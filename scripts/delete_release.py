@@ -8,7 +8,6 @@ def get_release_id(tag_to_delete, github_repository, github_token):
         "Authorization": f"Bearer {github_token}"
     }
     response = requests.get(url, headers=headers)
-    response.raise_for_status()
     releases = response.json()
 
     return releases['id']
