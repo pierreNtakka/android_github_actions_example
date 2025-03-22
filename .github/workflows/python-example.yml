@@ -3,6 +3,11 @@ name: Python Example
 on:
   workflow_dispatch:
     inputs:
+      versionToDelete:
+        type: string
+        description: Specificare la versione da cancellare
+        required: true
+        default: '25.03.0'
       debug:
         type: boolean
         description: Printa dei valori che aiutano il debug
@@ -13,11 +18,23 @@ jobs:
   python-version:
     runs-on: ubuntu-latest
     steps:
-      - name: Install Python dependencies
-        run: pip install requests
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Controlla versione Python
+        shell: python
         run: python scripts/check_python_version.py
+  
+  clean-package-registry:
+    runs-on: ubuntu-latest
+    needs: python-version
+    strategy:
+      matrix:
+        flavour: [ dev-release, uat-release, preProd-release, prod-release ]
+    steps:
+      - name: Delete ${{ env.VERSION_TO_DELETE }}
+        id: delete_pkg_registry
+        env:
+          VERSION_TO_DELETE: ${{ inputs.versionToDelete }}-${{ matrix.flavour }}
+        shell: python
+        run: python scripts/delete_pkg_registry.py
