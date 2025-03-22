@@ -60,6 +60,10 @@ def main():
     else:
         print(f"La release associata al tag {tag_to_delete} non esiste, niente da cancellare.")
 
+    #Non è necessario è solo per avere un esempio di output. 'a' sta per append, quindi aggiunge alla fine del file.
+    with open(os.getenv('GITHUB_OUTPUT'), 'a') as output_file:
+        output_file.write(f"release_deleted=true\n")
+
 
 if __name__ == "__main__":
     main()
