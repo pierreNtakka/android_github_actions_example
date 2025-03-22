@@ -45,7 +45,7 @@ def main():
     
     if release_id:
         print(f"La release associata al tag {tag_to_delete} esiste, procedo con la cancellazione.")
-        status_code = delete_release(github_token, release_id, github_token)
+        status_code = delete_release(git_hub_repository, release_id, github_token)
         
         if status_code == 204:
             print(f"La release associata al tag {tag_to_delete} è stata cancellata con successo.")
@@ -57,10 +57,6 @@ def main():
             sys.exit(1)
     else:
         print(f"La release associata al tag {tag_to_delete} non esiste, niente da cancellare.")
-
-    #Non è necessario è solo per avere un esempio di output. 'a' sta per append, quindi aggiunge alla fine del file.
-    with open(os.getenv('GITHUB_OUTPUT'), 'a') as output_file:
-        output_file.write(f"release_deleted=true\n")
 
 
 if __name__ == "__main__":
