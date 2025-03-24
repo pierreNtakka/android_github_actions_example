@@ -165,6 +165,7 @@ jobs:
         run: |
           git fetch origin ${{ needs.create-branch.outputs.branch_name }}
           git merge origin/${{ needs.create-branch.outputs.branch_name }}
+          git push
 
       - name: Enable local implementation
         run: python scripts/toggle_gradle_local_impl.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }} --enable true
@@ -174,7 +175,7 @@ jobs:
   
       - name: Commit and push
         run: |
-            git status
+            git add. 
             git commit -m "chore: enable local implementation"
             git push
 
