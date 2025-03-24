@@ -1,4 +1,4 @@
-name: Lib into PKG Registry and App into Firebase App Distr
+name: Test Remove App Demo from Firebase App Distribution
 
 on:
   workflow_dispatch:
