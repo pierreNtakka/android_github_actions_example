@@ -55,12 +55,10 @@ jobs:
           debug: ${{ github.event.inputs.debug }} 
 
       - name: Execute clean
-        run: |
-          ./gradlew clean
+        run: ./gradlew clean
 
       - name: Execute test
-        run: |
-          ./gradlew test
+        run: ./gradlew test
 
   increment-version:
     needs: [ create-branch, testing ]
