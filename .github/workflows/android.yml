@@ -151,8 +151,34 @@ jobs:
       - name: Upload SDK ${{ matrix.flavour }}
         run: ./gradlew uploadToGitHubPkg${{ matrix.flavour }}
 
+  reset-local-implementation:
+    needs:  [create-branch, increment-version,testing, upload-sdk, upload-app-demo ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.create-branch.outputs.branch_name }}
+
+      - name: Print working branch value
+        if: ${{ github.event.inputs.debug == 'true' }}
+        run: |
+          echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
+      
+      - name: Enable local implementation
+        run: python scripts/toggle_gradle_local_impl.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }} --enable true
+  
+      - name: Set to false is first release
+        run: python scripts/not_first_release.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
+    
+      - name: Commit and push
+        run: |
+          git add. 
+          git commit -m "chore: enable local implementation"
+          git push    
+  
   create-release:
-    needs: [ create-branch, increment-version,testing, upload-sdk, upload-app-demo ]
+    needs: [ create-branch, increment-version,testing, upload-sdk, upload-app-demo, reset-local-implementation ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch
@@ -165,20 +191,7 @@ jobs:
         run: |
           git fetch origin ${{ needs.create-branch.outputs.branch_name }}
           git merge origin/${{ needs.create-branch.outputs.branch_name }}
-          git push
-
-      - name: Enable local implementation
-        run: python scripts/toggle_gradle_local_impl.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }} --enable true
-
-      - name: Set to false is first release
-        run: python scripts/not_first_release.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
-  
-      - name: Commit and push
-        run: |
-            git add. 
-            git commit -m "chore: enable local implementation"
-            git push
-
+        
       - name: Git Tag
         id: create_git_tag
         run: |
@@ -187,7 +200,7 @@ jobs:
           echo "GIT_TAG_NAME=$GIT_TAG_NAME" >> $GITHUB_OUTPUT
           
           git tag $GIT_TAG_NAME
-          git push origin $GIT_TAG_NAME
+          x
 
       - name: Create Release
         uses: actions/create-release@v1
