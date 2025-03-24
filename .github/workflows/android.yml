@@ -45,14 +45,14 @@ jobs:
           ref: ${{ needs.create-branch.outputs.branch_name }}
 
       - name: Print working branch value
-        if: ${{ github.event.inputs.debug == 'true' }}
+        if: ${{ inputs.debug == 'true' }}
         run: |
           echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
           
       - name: Set up Gradlew
         uses: ./.github/actions/setup-gradle
         with:
-          debug: ${{ github.event.inputs.debug }} 
+          debug: ${{ inputs.debug }} 
 
       - name: Execute clean
         run: ./gradlew clean
@@ -63,7 +63,7 @@ jobs:
   increment-version:
     needs: [ create-branch, testing ]
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.incrementVersion == 'true' }}
+    if: ${{ inputs.incrementVersion == 'true' }}
     steps:
       - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}
         uses: actions/checkout@v4
@@ -112,7 +112,7 @@ jobs:
           ref: ${{ needs.create-branch.outputs.branch_name }}
 
       - name: Print working branch value
-        if: ${{ github.event.inputs.debug == 'true' }}
+        if: ${{ inputs.debug == 'true' }}
         run: |
           echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
 
@@ -144,7 +144,7 @@ jobs:
           ref: ${{ needs.create-branch.outputs.branch_name }}
 
       - name: Print working branch value
-        if: ${{ github.event.inputs.debug == 'true' }}
+        if: ${{ inputs.debug == 'true' }}
         run: |
           echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
           
@@ -161,7 +161,7 @@ jobs:
           ref: ${{ needs.create-branch.outputs.branch_name }}
 
       - name: Print working branch value
-        if: ${{ github.event.inputs.debug == 'true' }}
+        if: ${{ inputs.debug == 'true' }}
         run: |
           echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
       
@@ -171,6 +171,9 @@ jobs:
       - name: Set to false is first release
         run: python scripts/not_first_release.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
     
+      - name: Set up Git
+        uses: ./.github/actions/setup-git
+        
       - name: Commit and push
         run: |
           git add . 
