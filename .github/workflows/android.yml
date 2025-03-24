@@ -173,7 +173,7 @@ jobs:
     
       - name: Commit and push
         run: |
-          git add. 
+          git add . 
           git commit -m "chore: enable local implementation"
           git push    
   
@@ -200,7 +200,6 @@ jobs:
           echo "GIT_TAG_NAME=$GIT_TAG_NAME" >> $GITHUB_OUTPUT
           
           git tag $GIT_TAG_NAME
-          x
 
       - name: Create Release
         uses: actions/create-release@v1
@@ -218,7 +217,7 @@ jobs:
 
   clean:
     runs-on: ubuntu-latest
-    needs: [ create-branch, increment-version,testing, upload-sdk, upload-app-demo, create-release ]
+    needs: [ create-branch, increment-version,testing, upload-sdk, upload-app-demo, reset-local-implementation, create-release ]
     if: success()
     steps:
       - name: Checkout Project
