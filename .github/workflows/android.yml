@@ -172,9 +172,9 @@ jobs:
       - name: Set to false is first release
         run: python scripts/not_first_release.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
   
-      - name: Commit and push the merge
+      - name: Commit and push
         run: |
-            git add .
+            git status
             git commit -m "chore: enable local implementation"
             git push
 
