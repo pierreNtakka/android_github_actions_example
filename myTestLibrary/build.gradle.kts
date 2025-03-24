@@ -73,7 +73,7 @@ android {
             .map { it as com.android.build.gradle.internal.api.LibraryVariantOutputImpl }
             .forEach { output ->
                 var aarfileName =
-                    "myTestLibrary-${this.productFlavors[0].name}${this.buildType.name.capitalized()}"
+                    "myTestLibrary-${this.productFlavors[0].name}${this.buildType.name.replaceFirstChar { it.uppercase() }}"
                 aarfileName += ".aar"
                 println("aarFilenName=$aarfileName}")
                 output.outputFileName = aarfileName
