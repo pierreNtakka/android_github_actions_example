@@ -28,3 +28,5 @@ render.experimental.xml
 
 # Android Profiling
 *.hprof
+
+scripts/__pycache__/
