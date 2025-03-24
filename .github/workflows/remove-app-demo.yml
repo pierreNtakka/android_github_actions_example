@@ -1,0 +1,17 @@
+name: Lib into PKG Registry and App into Firebase App Distr
+
+on:
+  workflow_dispatch:
+   
+jobs: 
+  remove-app-demo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Git
+        uses: ./.github/actions/setup-git
+
+      - name: Remove App Demo
+        run: pip install firebase-admin
