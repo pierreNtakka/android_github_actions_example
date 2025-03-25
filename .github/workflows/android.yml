@@ -7,10 +7,7 @@ on:
         type: boolean
         description: Printa dei valori che aiutano il debug
         default: false
-      incrementVersion:
-        type: boolean
-        description: Incrementa la version
-        default: true
+
 env:
   GRADLE_PROPERTIES_FILENAME: "gradle.properties"
   
@@ -63,7 +60,6 @@ jobs:
   increment-version:
     needs: [ create-branch, testing ]
     runs-on: ubuntu-latest
-    if: ${{ inputs.incrementVersion == 'true' }}
     steps:
       - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}
         uses: actions/checkout@v4
