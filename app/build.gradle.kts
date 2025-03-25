@@ -14,8 +14,6 @@ plugins {
 }
 
 apply(from = "firebase-app-distribution.gradle")
-apply(from = "testing.gradle.kts")
-
 
 android {
     namespace = "com.pditta.githubactions"
