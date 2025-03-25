@@ -52,10 +52,10 @@ jobs:
           debug: ${{ github.event.inputs.debug }} 
 
       - name: Execute clean
-        run:  echo "./gradlew clean"
+        run:  ./gradlew clean
 
       - name: Execute test
-        run: echo "./gradlew test"
+        run: ./gradlew test
 
   increment-version:
     needs: [ create-branch, testing ]
@@ -118,7 +118,7 @@ jobs:
         run: python scripts/config_app_distr.py
 
       - name: Upload App Demo ${{ matrix.flavour }}
-        run: echo "Uploading App Demo ${{ matrix.flavour }}"
+        run: ./gradlew uploadToAppDistribution${{ matrix.flavour }}
 
       - name: Clean up JSON file and environment variable
         if: always()
@@ -145,7 +145,7 @@ jobs:
           echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
           
       - name: Upload SDK ${{ matrix.flavour }}
-        run: echo "Uploading SDK ${{ matrix.flavour }}"
+        run: ./gradlew uploadToGitHubPkg${{ matrix.flavour }}
 
   reset-local-implementation:
     needs:  [create-branch, increment-version,testing, upload-sdk, upload-app-demo ]
