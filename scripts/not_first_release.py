@@ -4,7 +4,7 @@ from gradle_utils import update_gradle_properties
 
 def main():
     parser = argparse.ArgumentParser(description='Print Gradle Properties')
-    parser.add_argument('--gradleFileName', type=str, default='gradle.properties', help='The gradle file name')
+    parser.add_argument('--gradleFileName', type=str, help='The gradle file name')
     
     args = parser.parse_args()
 
