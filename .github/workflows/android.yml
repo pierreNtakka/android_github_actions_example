@@ -161,18 +161,25 @@ jobs:
         run: |
           echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
       
+      - name: Print Gradle properties PRE reset
+        if: ${{ inputs.debug == 'true' }}
+        run: python scripts/print_gradle_properties.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
+
       - name: Enable local implementation
         run: python scripts/toggle_gradle_local_impl.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }} --enable true
   
       - name: Set to false is first release
         run: python scripts/not_first_release.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
     
+      - name: Print Gradle properties POST reset
+        if: ${{ inputs.debug == 'true' }}
+        run: python scripts/print_gradle_properties.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
+
       - name: Set up Git
         uses: ./.github/actions/setup-git
         
       - name: Commit and push
         run: |
-          git add . 
           git commit -m "chore: enable local implementation"
           git push    
   
