@@ -180,6 +180,7 @@ jobs:
         
       - name: Commit and push
         run: |
+          git add .
           git commit -m "chore: enable local implementation"
           git push    
   
