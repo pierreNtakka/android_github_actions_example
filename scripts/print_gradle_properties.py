@@ -9,8 +9,7 @@ def main():
     args = parser.parse_args()
 
     gradle_file_name = args.gradleFileName
-    debug = args.debug.lower() == 'true'
-
+   
     properties = read_gradle_properties(gradle_file_name)
     
     app_demo_version_code = properties.get('APP_DEMO_VERSION_CODE', 'N/A')
