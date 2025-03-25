@@ -11,7 +11,9 @@ def main():
 
     gradle_file_name = args.gradleFileName
     properties = read_gradle_properties(gradle_file_name)
-    enabled = args.enable=='true'
+    enabled = args.enable == 'true'
+
+    print(enabled)
 
     if(enabled):
         properties['ENABLE_LOCAL_IMPLEMENTATION'] = 'true'
