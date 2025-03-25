@@ -24,7 +24,7 @@ jobs:
             echo "changes=true" >> $GITHUB_OUTPUT
 
       - name: Commit and push changes
-        if: ${{ steps.check_changes.outputs.changes == 'true' }}
+        if: ${{ steps.check_changes.outputs.changes == 'true'}}
         run: |
           git add .
           git commit -m "chore: enable local implementation"
