@@ -16,7 +16,7 @@ jobs:
       - name: Check for changes
         id: check_changes
         run: |
-          if [[ -n $(git status --porcelain) ]]; then
+          if git diff-index --quiet HEAD --; then
             echo "No changes to commit."
             echo "changes=false" >> $GITHUB_OUTPUT
           else
