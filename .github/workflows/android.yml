@@ -42,14 +42,14 @@ jobs:
           ref: ${{ needs.create-branch.outputs.branch_name }}
 
       - name: Print working branch value
-        if: ${{ inputs.debug == 'true' }}
+        if: ${{ github.event.inputs.debug == 'true' }}
         run: |
           echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
           
       - name: Set up Gradlew
         uses: ./.github/actions/setup-gradle
         with:
-          debug: ${{ inputs.debug }} 
+          debug: ${{ github.event.inputs.debug }} 
 
       - name: Execute clean
         run: ./gradlew clean
@@ -67,7 +67,7 @@ jobs:
           ref: ${{ needs.create-branch.outputs.branch_name }}
 
       - name: Print working branch value
-        if: ${{ inputs.debug == 'true' }}
+        if: ${{ github.event.inputs.debug == 'true' }}
         run: |
           echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
 
@@ -75,7 +75,7 @@ jobs:
         run: python scripts/toggle_gradle_local_impl.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }} --enable false
 
       - name: Print Version properties PRE incremented
-        if: ${{ inputs.debug == 'true' }}
+        if: ${{ github.event.inputs.debug == 'true' }}
         run: python scripts/print_gradle_properties.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
         
       - name: Increment App and SDK Version
@@ -83,7 +83,7 @@ jobs:
         run: python scripts/increment_version.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
 
       - name: Print Version properties POST incremented 
-        if: ${{ inputs.debug == 'true' }}
+        if: ${{ github.event.inputs.debug == 'true' }}
         run: python scripts/print_gradle_properties.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
 
       - name: Set up Git
@@ -108,7 +108,7 @@ jobs:
           ref: ${{ needs.create-branch.outputs.branch_name }}
 
       - name: Print working branch value
-        if: ${{ inputs.debug == 'true' }}
+        if: ${{ github.event.inputs.debug == 'true' }}
         run: |
           echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
 
@@ -140,7 +140,7 @@ jobs:
           ref: ${{ needs.create-branch.outputs.branch_name }}
 
       - name: Print working branch value
-        if: ${{ inputs.debug == 'true' }}
+        if: ${{ github.event.inputs.debug == 'true' }}
         run: |
           echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
           
@@ -157,12 +157,12 @@ jobs:
           ref: ${{ needs.create-branch.outputs.branch_name }}
 
       - name: Print working branch value
-        if: ${{ inputs.debug == 'true' }}
+        if: ${{ github.event.inputs.debug == 'true' }}
         run: |
           echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
       
       - name: Print Gradle properties PRE reset
-        if: ${{ inputs.debug == 'true' }}
+        if: ${{ github.event.inputs.debug == 'true' }}
         run: python scripts/print_gradle_properties.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
 
       - name: Enable local implementation
@@ -172,7 +172,7 @@ jobs:
         run: python scripts/not_first_release.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
     
       - name: Print Gradle properties POST reset
-        if: ${{ inputs.debug == 'true' }}
+        if: ${{ github.event.inputs.debug == 'true' }}
         run: python scripts/print_gradle_properties.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
 
       - name: Set up Git
