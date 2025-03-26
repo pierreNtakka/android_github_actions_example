@@ -1,6 +1,7 @@
 import os
 import requests
 import sys
+import argparse
 
 def get_version_id(package_name, version_to_delete, github_token):
     url = f"https://api.github.com/user/packages/maven/{package_name}/versions"
@@ -33,9 +34,14 @@ def delete_version(package_name, version_id, github_token):
     return response.status_code
 
 def main():
+    parser = argparse.ArgumentParser(description='Parametri per la cancellazione della release')
+    parser.add_argument('--token', type=str, help='GitHub Token')
+    parser.add_argument('--version', type=str, help='Version to delete')
+    args = parser.parse_args()
+
     package_name = os.getenv('PACKAGE_NAME')
-    version_to_delete = os.getenv('VERSION_TO_DELETE')
-    github_token = os.getenv('GITHUB_TOKEN')
+    version_to_delete = args.version
+    github_token = args.token
 
     if not package_name or not version_to_delete or not github_token:
         print("Errore: Assicurati che le variabili d'ambiente PACKAGE_NAME, VERSION_TO_DELETE e GITHUB_TOKEN siano impostate.")

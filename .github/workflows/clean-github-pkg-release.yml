@@ -24,9 +24,8 @@ jobs:
       - name: Delete ${{ env.VERSION_TO_DELETE }}
         id: delete_pkg_registry
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION_TO_DELETE: ${{ inputs.versionToDelete }}-${{ matrix.flavour }}
-        run: python scripts/delete_pkg_registry.py
+        run: python scripts/delete_pkg_registry.py --token ${{ secrets.GITHUB_TOKEN }} --version ${{ env.VERSION_TO_DELETE }}
 
   delete-release:
     runs-on: ubuntu-latest
@@ -37,11 +36,7 @@ jobs:
 
       - name: Delete Release
         id: delete_release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG_TO_DELETE: ${{ inputs.versionToDelete }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-        run: python scripts/delete_release.py
+        run: python scripts/delete_release.py --repository ${{ github.repository }} --tag ${{ inputs.versionToDelete }} --token ${{ secrets.GITHUB_TOKEN }}
   
   remove-tag:
     runs-on: ubuntu-latest

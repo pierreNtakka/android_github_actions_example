@@ -1,6 +1,6 @@
-import os
 import requests
 import sys
+import argparse
 
 def get_release_id(tag_to_delete, github_repository, github_token):
     url = f"https://api.github.com/repos/{github_repository }/releases/tags/{tag_to_delete}"
@@ -33,9 +33,15 @@ def delete_release(github_repository, release_id, github_token):
     return response.status_code
 
 def main():
-    git_hub_repository = os.getenv('GITHUB_REPOSITORY')
-    tag_to_delete = os.getenv('TAG_TO_DELETE')
-    github_token = os.getenv('GITHUB_TOKEN')
+    parser = argparse.ArgumentParser(description='Parametri per la cancellazione della release')
+    parser.add_argument('--repository', type=str, help='GitHub repository')
+    parser.add_argument('--tag', type=str, help='Tag da cancellare')
+    parser.add_argument('--token', type=str, help='GitHub token')
+    args = parser.parse_args()
+
+    git_hub_repository = args.repository
+    tag_to_delete = args.tag
+    github_token = args.token
 
     if not git_hub_repository or not tag_to_delete or not github_token:
         print("Errore: Assicurati che le variabili d'ambiente GITHUB_REPOSITORY, TAG_TO_DELETE e GITHUB_TOKEN siano impostate.")
