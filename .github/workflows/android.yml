@@ -226,7 +226,9 @@ jobs:
 
       - name: Git merge ${{ needs.reset-local-implementation.outputs.branch_name }} into current
         run: |
-          git fetch origin ${{ needs.reset-local-implementation.outputs.branch_name }}
+          git fetch origin
+          git checkout main
+          git pull origin main
           git merge origin/${{ needs.reset-local-implementation.outputs.branch_name }}
           git push
         
