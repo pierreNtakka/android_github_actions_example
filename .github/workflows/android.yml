@@ -12,7 +12,7 @@ env:
   GRADLE_PROPERTIES_FILENAME: "gradle.properties"
   
 jobs:
-   create-branch:
+  create-branch:
     runs-on: ubuntu-latest
     outputs:
       branch_name: ${{ steps.create_branch.outputs.branch_name }}
