@@ -54,10 +54,10 @@ jobs:
           debug: ${{ github.event.inputs.debug }} 
 
       - name: Execute clean
-        run:  echo "./gradlew clean"
+        run: ./gradlew clean
 
       - name: Execute test
-        run: echo "./gradlew test"
+        run: ./gradlew test
 
   increment-version:
     needs: testing
@@ -127,7 +127,7 @@ jobs:
         uses: ./.github/actions/setup-gradle
      
       - name: Upload App Demo ${{ matrix.flavour }}
-        run: echo "./gradlew uploadToAppDistribution${{ matrix.flavour }}"
+        run: ./gradlew uploadToAppDistribution${{ matrix.flavour }}
 
       - name: Clean up JSON file and environment variable
         if: always()
@@ -159,7 +159,7 @@ jobs:
         uses: ./.github/actions/setup-gradle
           
       - name: Upload SDK ${{ matrix.flavour }}
-        run: echo "./gradlew uploadToGitHubPkg${{ matrix.flavour }}"
+        run: /gradlew uploadToGitHubPkg${{ matrix.flavour }}
 
   reset-local-implementation:
     needs:  [upload-sdk, upload-app-demo ]
@@ -267,4 +267,4 @@ jobs:
 
       - name: Delete branch
         run: |
-          echo "git push origin --delete ${{ needs.create-release.outputs.branch_name }}"
+          git push origin --delete ${{ needs.create-release.outputs.branch_name }}
