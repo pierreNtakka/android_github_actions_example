@@ -35,6 +35,8 @@ jobs:
   testing:
     needs: create-branch
     runs-on: ubuntu-latest
+    outputs:
+      branch_name: ${{ needs.create-branch.outputs.branch_name }}
     steps:
       - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}
         uses: actions/checkout@v4
@@ -58,18 +60,20 @@ jobs:
         run: ./gradlew test
 
   increment-version:
-    needs: [ create-branch, testing ]
+    needs: testing
     runs-on: ubuntu-latest
+    outputs:
+      branch_name: ${{ needs.testing.outputs.branch_name }}
     steps:
-      - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}
+      - name: Checkout branch ${{ needs.testing.outputs.branch_name }}
         uses: actions/checkout@v4
         with:
-          ref: ${{ needs.create-branch.outputs.branch_name }}
+          ref: ${{ needs.testing.outputs.branch_name }}
 
       - name: Print working branch value
         if: ${{ github.event.inputs.debug == 'true' }}
         run: |
-          echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
+          echo "Working branch is: ${{ needs.testing.outputs.branch_name }}
 
       - name: Disable local implementation
         run: python scripts/toggle_gradle_local_impl.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }} --enable false
@@ -96,21 +100,23 @@ jobs:
           git push
 
   upload-app-demo:
-    needs: [ create-branch, testing, increment-version ]
+    needs: increment-version
+    outputs:
+      branch_name: ${{ needs.increment-version.outputs.branch_name }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
         flavour: [ DevDebug, UatDebug, PreProdDebug, ProdDebug ]
     steps:
-      - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}
+      - name: Checkout branch ${{ needs.increment-version.outputs.branch_name }}
         uses: actions/checkout@v4
         with:
-          ref: ${{ needs.create-branch.outputs.branch_name }}
+          ref: ${{ needs.increment-version.outputs.branch_name }}
 
       - name: Print working branch value
         if: ${{ github.event.inputs.debug == 'true' }}
         run: |
-          echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
+          echo "Working branch is: ${{ needs.increment-version.outputs.branch_name }}"
 
       - name: Create Firebase App Keys
         env:
@@ -125,8 +131,10 @@ jobs:
         run: python scripts/remove_config_app_dist.py
   
   upload-sdk:
-    needs: [ create-branch, increment-version, testing ]
+    needs: increment-version
     runs-on: ubuntu-latest
+    outputs:
+      branch_name: ${{ needs.increment-version.outputs.branch_name }}
     env:
       GPR_USER: ${{ github.actor }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -134,10 +142,10 @@ jobs:
       matrix:
         flavour: [ DevRelease, UatRelease, PreProdRelease, ProdRelease ]
     steps:
-      - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}
+      - name: Checkout branch ${{ needs.increment-version.outputs.branch_name }}
         uses: actions/checkout@v4
         with:
-          ref: ${{ needs.create-branch.outputs.branch_name }}
+          ref: ${{ needs.increment-version.outputs.branch_name }}
 
       - name: Print working branch value
         if: ${{ github.event.inputs.debug == 'true' }}
@@ -148,18 +156,20 @@ jobs:
         run: ./gradlew uploadToGitHubPkg${{ matrix.flavour }}
 
   reset-local-implementation:
-    needs:  [create-branch, increment-version,testing, upload-sdk, upload-app-demo ]
+    needs:  [upload-sdk, upload-app-demo ]
+    outputs:
+      branch_name: ${{ needs.upload-sdk.outputs.branch_name }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout branch ${{ needs.create-branch.outputs.branch_name }}
+      - name: Checkout branch ${{ needs.upload-sdk.outputs.branch_name }}
         uses: actions/checkout@v4
         with:
-          ref: ${{ needs.create-branch.outputs.branch_name }}
+          ref: ${{ needs.upload-sdk.outputs.branch_name }}
 
       - name: Print working branch value
         if: ${{ github.event.inputs.debug == 'true' }}
         run: |
-          echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
+          echo "Working branch is: ${{ needs.upload-sdk.outputs.branch_name }}"
       
       - name: Print Gradle properties PRE reset
         if: ${{ github.event.inputs.debug == 'true' }}
@@ -197,8 +207,10 @@ jobs:
           git push
   
   create-release:
-    needs: [ create-branch, increment-version,testing, upload-sdk, upload-app-demo, reset-local-implementation ]
+    needs: reset-local-implementation 
     runs-on: ubuntu-latest
+    outputs:
+      branch_name: ${{ needs.reset-local-implementation.outputs.branch_name }}
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4
@@ -206,10 +218,10 @@ jobs:
       - name: Set up Git
         uses: ./.github/actions/setup-git
 
-      - name: Git merge ${{ needs.create-branch.outputs.branch_name }} into current
+      - name: Git merge ${{ needs.reset-local-implementation.outputs.branch_name }} into current
         run: |
-          git fetch origin ${{ needs.create-branch.outputs.branch_name }}
-          git merge origin/${{ needs.create-branch.outputs.branch_name }}
+          git fetch origin ${{ needs.reset-local-implementation.outputs.branch_name }}
+          git merge origin/${{ needs.reset-local-implementation.outputs.branch_name }}
           git push
         
       - name: Git Tag
@@ -237,7 +249,7 @@ jobs:
 
   clean:
     runs-on: ubuntu-latest
-    needs: [ create-branch, increment-version,testing, upload-sdk, upload-app-demo, reset-local-implementation, create-release ]
+    needs: create-release
     if: success()
     steps:
       - name: Checkout Project
@@ -248,4 +260,4 @@ jobs:
 
       - name: Delete branch
         run: |
-          git push origin --delete ${{ needs.create-branch.outputs.branch_name }}
+          git push origin --delete ${{ needs.create-release.outputs.branch_name }}
