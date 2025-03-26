@@ -76,19 +76,19 @@ jobs:
           echo "Working branch is: ${{ needs.testing.outputs.branch_name }}"
 
       - name: Disable local implementation
-        run: python scripts/toggle_gradle_local_impl.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }} --enable false
+        run: python .github/scripts/toggle_gradle_local_impl.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }} --enable false
 
       - name: Print Version properties PRE incremented
         if: ${{ github.event.inputs.debug == 'true' }}
-        run: python scripts/print_gradle_properties.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
+        run: python .github/scripts/print_gradle_properties.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
         
       - name: Increment App and SDK Version
         id: increment_app_sdk_version
-        run: python scripts/increment_version.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
+        run: python .github/scripts/increment_version.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
 
       - name: Print Version properties POST incremented 
         if: ${{ github.event.inputs.debug == 'true' }}
-        run: python scripts/print_gradle_properties.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
+        run: python .github/scripts/print_gradle_properties.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
 
       - name: Set up Git
         uses: ./.github/actions/setup-git
@@ -121,7 +121,7 @@ jobs:
       - name: Create Firebase App Keys
         env:
           APP_DISTR_FILE_CONTENT_KEY: ${{ secrets.APP_DISTR_FILE_CONTENT_KEY }}
-        run: python scripts/config_app_distr.py
+        run: python .github/scripts/config_app_distr.py
 
       - name: Set up Gradlew
         uses: ./.github/actions/setup-gradle
@@ -131,7 +131,7 @@ jobs:
 
       - name: Clean up JSON file and environment variable
         if: always()
-        run: python scripts/remove_config_app_dist.py
+        run: python .github/scripts/remove_config_app_dist.py
   
   upload-sdk:
     needs: increment-version
@@ -179,17 +179,17 @@ jobs:
       
       - name: Print Gradle properties PRE reset
         if: ${{ github.event.inputs.debug == 'true' }}
-        run: python scripts/print_gradle_properties.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
+        run: python .github/scripts/print_gradle_properties.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
 
       - name: Enable local implementation
-        run: python scripts/toggle_gradle_local_impl.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }} --enable true
+        run: python .github/scripts/toggle_gradle_local_impl.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }} --enable true
   
       - name: Set to false is first release
-        run: python scripts/not_first_release.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
+        run: python .github/scripts/not_first_release.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
     
       - name: Print Gradle properties POST reset
         if: ${{ github.event.inputs.debug == 'true' }}
-        run: python scripts/print_gradle_properties.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
+        run: python .github/scripts/print_gradle_properties.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }}
 
       - name: Set up Git
         uses: ./.github/actions/setup-git
