@@ -159,7 +159,7 @@ jobs:
         uses: ./.github/actions/setup-gradle
           
       - name: Upload SDK ${{ matrix.flavour }}
-        run: /gradlew uploadToGitHubPkg${{ matrix.flavour }}
+        run: ./gradlew uploadToGitHubPkg${{ matrix.flavour }}
 
   reset-local-implementation:
     needs:  [upload-sdk, upload-app-demo ]
