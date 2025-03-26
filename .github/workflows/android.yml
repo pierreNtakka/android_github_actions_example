@@ -119,6 +119,7 @@ jobs:
         uses: ./.github/actions/setup-git
 
       - name: Shoud run
+        id: should_run
         run: echo "should_run=true" >> $GITHUB_OUTPUT
       
       - name: Commit And Push
