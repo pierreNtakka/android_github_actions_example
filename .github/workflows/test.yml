@@ -29,5 +29,5 @@ jobs:
         
       - name: Verify inputs parameters
         run: |
-            run: python scripts/inputs_verification.py --uploadAppDemo ${{ github.event.inputs.upload_app_demo }} --uploadSdk ${{ github.event.inputs.upload_app_sdk }} --incrementVersion ${{ github.event.inputs.increment_version }}
+          python scripts/inputs_verification.py --uploadAppDemo ${{ github.event.inputs.upload_app_demo }} --uploadSdk ${{ github.event.inputs.upload_app_sdk }} --incrementVersion ${{ github.event.inputs.increment_version }}
     
