@@ -27,6 +27,9 @@ jobs:
   verification:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+    
       - name: Verify inputs parameters
         run: |
           run: python scripts/inputs_verification.py --uploadAppDemo ${{ github.event.inputs.upload_app_demo }} --uploadSdk ${{ github.event.inputs.upload_app_sdk }} --incrementVersion ${{ github.event.inputs.increment_version }}
