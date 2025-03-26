@@ -21,10 +21,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Delete ${{ env.VERSION_TO_DELETE }}
-        id: delete_pkg_registry
+      - name: Delete PKG Registry ${{ env.VERSION_TO_DELETE }}
         env:
-          VERSION_TO_DELETE: ${{ inputs.versionToDelete }}-${{ matrix.flavour }}
+          VERSION_TO_DELETE: "${{ inputs.versionToDelete }}-${{ matrix.flavour }}"
         run: python scripts/delete_pkg_registry.py --token ${{ secrets.GITHUB_TOKEN }} --version ${{ env.VERSION_TO_DELETE }}
 
   delete-release:
@@ -34,8 +33,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Delete Release
-        id: delete_release
+      - name: Delete Release ${{ inputs.versionToDelete }}
         run: python scripts/delete_release.py --repository ${{ github.repository }} --tag ${{ inputs.versionToDelete }} --token ${{ secrets.GITHUB_TOKEN }}
   
   remove-tag:
@@ -48,7 +46,7 @@ jobs:
       - name: Set up Git
         uses: ./.github/actions/setup-git
 
-      - name: Check if Tag Exists
+      - name: Check if Tag ${{ inputs.versionToDelete }} Exists
         id: check_tag
         run: |
           if git ls-remote --tags origin | grep -q "refs/tags/${{ inputs.versionToDelete }}"; then
@@ -57,7 +55,7 @@ jobs:
             echo "TAG_EXISTS=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Delete Git Tag
+      - name: Delete Git Tag ${{ inputs.versionToDelete }}
         if: ${{ steps.check_tag.outputs.TAG_EXISTS == 'true' }}
         run: |
           git push origin --delete ${{ inputs.versionToDelete }}
