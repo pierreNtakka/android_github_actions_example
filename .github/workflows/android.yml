@@ -73,7 +73,7 @@ jobs:
       - name: Print working branch value
         if: ${{ github.event.inputs.debug == 'true' }}
         run: |
-          echo "Working branch is: ${{ needs.testing.outputs.branch_name }}
+          echo "Working branch is: ${{ needs.testing.outputs.branch_name }}"
 
       - name: Disable local implementation
         run: python scripts/toggle_gradle_local_impl.py --gradleFileName ${{ env.GRADLE_PROPERTIES_FILENAME }} --enable false
@@ -150,7 +150,7 @@ jobs:
       - name: Print working branch value
         if: ${{ github.event.inputs.debug == 'true' }}
         run: |
-          echo "Working branch is: ${{ needs.create-branch.outputs.branch_name }}"
+          echo "Working branch is: ${{ needs.increment-version.outputs.branch_name }}"
           
       - name: Upload SDK ${{ matrix.flavour }}
         run: ./gradlew uploadToGitHubPkg${{ matrix.flavour }}
