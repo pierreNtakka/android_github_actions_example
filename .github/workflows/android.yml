@@ -128,6 +128,7 @@ jobs:
     if: ${{ github.event.inputs.upload_app_demo == 'true' }}
     outputs:
       branch_name: ${{ needs.increment-version.outputs.branch_name }}
+      should_run: ${{ steps.should_run.outputs.should_run }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -148,6 +149,13 @@ jobs:
           APP_DISTR_FILE_CONTENT_KEY: ${{ secrets.APP_DISTR_FILE_CONTENT_KEY }}
         run: python scripts/config_app_distr.py
 
+      - name: Set up Gradlew
+        uses: ./.github/actions/setup-gradle
+      
+      - name: Should run
+        id: should_run
+        run: echo "should_run=true" >> $GITHUB_OUTPUT
+
       - name: Upload App Demo ${{ matrix.flavour }}
         run: ./gradlew uploadToAppDistribution${{ matrix.flavour }}
 
@@ -161,6 +169,7 @@ jobs:
     if: ${{ github.event.inputs.upload_app_sdk == 'true' }}
     outputs:
       branch_name: ${{ needs.increment-version.outputs.branch_name }}
+      should_run: ${{ steps.should_run.outputs.should_run }}
     env:
       GPR_USER: ${{ github.actor }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -177,6 +186,13 @@ jobs:
         if: ${{ github.event.inputs.debug == 'true' }}
         run: |
           echo "Working branch is: ${{ needs.increment-version.outputs.branch_name }}"
+      
+      - name: Set up Gradlew
+        uses: ./.github/actions/setup-gradle
+    
+      - name: Should run
+        id: should_run
+        run: echo "should_run=true" >> $GITHUB_OUTPUT
           
       - name: Upload SDK ${{ matrix.flavour }}
         run: ./gradlew uploadToGitHubPkg${{ matrix.flavour }}
@@ -185,6 +201,7 @@ jobs:
     needs:  [upload-sdk, upload-app-demo ]
     outputs:
       branch_name: ${{ needs.upload-sdk.outputs.branch_name }}
+    if: ${{ needs.upload-sdk.outputs.should_run == 'true' }} || ${{ needs.upload-app-demo.outputs.should_run == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch ${{ needs.upload-sdk.outputs.branch_name }}
