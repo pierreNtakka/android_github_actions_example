@@ -130,7 +130,7 @@ jobs:
 
   upload-app-demo:
     needs: increment-version
-    if: ${{ github.event.inputs.upload_app_demo == 'true' }} && ${{ needs.increment-version.outputs.should_run == 'true' }}
+    if: ${{ github.event.inputs.upload_app_demo == 'true' && needs.increment-version.outputs.should_run == 'true' }}
     outputs:
       branch_name: ${{ needs.increment-version.outputs.branch_name }}
       should_run: ${{ steps.should_run.outputs.should_run }}
@@ -171,7 +171,7 @@ jobs:
   upload-sdk:
     needs: increment-version
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.upload_app_sdk == 'true' }} && ${{ needs.increment-version.outputs.should_run == 'true' }}
+    if: ${{ github.event.inputs.upload_app_sdk == 'true' && needs.increment-version.outputs.should_run == 'true' }}
     outputs:
       branch_name: ${{ needs.increment-version.outputs.branch_name }}
       should_run: ${{ steps.should_run.outputs.should_run }}
