@@ -206,7 +206,7 @@ jobs:
     needs:  [upload-sdk, upload-app-demo ]
     outputs:
       branch_name: ${{ needs.upload-sdk.outputs.branch_name }}
-    if: ${{ needs.upload-sdk.outputs.should_run == 'true' }} || ${{ needs.upload-app-demo.outputs.should_run == 'true' }}
+    if: ${{ needs.upload-sdk.outputs.should_run == 'true' || needs.upload-app-demo.outputs.should_run == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch ${{ needs.upload-sdk.outputs.branch_name }}
