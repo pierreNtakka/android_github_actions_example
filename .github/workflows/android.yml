@@ -88,6 +88,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       branch_name: ${{ needs.testing.outputs.branch_name }}
+      should_run: ${{ steps.should_run.outputs.should_run }}
     steps:
       - name: Checkout branch ${{ needs.testing.outputs.branch_name }}
         uses: actions/checkout@v4
@@ -117,6 +118,9 @@ jobs:
       - name: Set up Git
         uses: ./.github/actions/setup-git
 
+      - name: Shoud run
+        run: echo "should_run=true" >> $GITHUB_OUTPUT
+      
       - name: Commit And Push
         run: |
           git add .
@@ -125,7 +129,7 @@ jobs:
 
   upload-app-demo:
     needs: increment-version
-    if: ${{ github.event.inputs.upload_app_demo == 'true' }}
+    if: ${{ github.event.inputs.upload_app_demo == 'true' }} && ${{ needs.increment-version.outputs.should_run == 'true' }}
     outputs:
       branch_name: ${{ needs.increment-version.outputs.branch_name }}
       should_run: ${{ steps.should_run.outputs.should_run }}
@@ -166,7 +170,7 @@ jobs:
   upload-sdk:
     needs: increment-version
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.upload_app_sdk == 'true' }}
+    if: ${{ github.event.inputs.upload_app_sdk == 'true' }} && ${{ needs.increment-version.outputs.should_run == 'true' }}
     outputs:
       branch_name: ${{ needs.increment-version.outputs.branch_name }}
       should_run: ${{ steps.should_run.outputs.should_run }}
