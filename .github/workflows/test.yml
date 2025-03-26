@@ -2,29 +2,29 @@ name: Test
 
 on:
   workflow_dispatch:
+    inputs:
+      debug:
+        type: boolean
+        description: Printa dei valori che aiutano il debug
+        default: false
+      increment_version:
+          type: boolean
+          description: Incrementa la versione dell'app e del SDK
+          default: true
+      upload_app_demo:
+          type: boolean
+          description: Upload App Demo
+          default: true
+      upload_app_sdk:  
+          type: boolean
+          description: Upload SDK
+          default: true
 
 jobs:
-  create-branch:
+  verification:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Git
-        uses: ./.github/actions/setup-git
-
-      - name: Check for changes
-        id: check_changes
+      - name: Verify inputs parameters
         run: |
-          if git diff-index --quiet HEAD --; then
-            echo "No changes to commit."
-            echo "changes=false" >> $GITHUB_OUTPUT
-          else
-            echo "Changes detected."
-            echo "changes=true" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Has gh clis
-        run: |
-          gh --version
-          gh auth status
+            run: python scripts/inputs_verification.py --uploadAppDemo ${{ github.event.inputs.upload_app_demo }} --uploadSdk ${{ github.event.inputs.upload_app_sdk }} --incrementVersion ${{ github.event.inputs.increment_version }}
+    
