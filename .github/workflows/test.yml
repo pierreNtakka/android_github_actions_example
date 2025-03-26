@@ -24,9 +24,7 @@ jobs:
             echo "changes=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: Commit and push changes
-        if: ${{ steps.check_changes.outputs.changes == 'true'}}
+      - name: Has gh clis
         run: |
-          git add .
-          git commit -m "chore: enable local implementation"
-          git push
+          gh --version
+          gh auth status
